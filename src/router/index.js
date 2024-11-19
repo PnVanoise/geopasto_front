@@ -139,7 +139,8 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: UnitePastoraleList,
+      meta: { requiresAuth: true },  // Route protégée
     },
     {
       path: '/UnitePastorales',
