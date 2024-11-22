@@ -88,8 +88,18 @@ const addGeoJsonLayer = () => {
       },
     }).addTo(props.map);
 
+
+    const bounds = geoLayer.value.getBounds();
+    if (bounds.isValid()) {
+      props.map.fitBounds(geoLayer.value.getBounds());
+    } else {
+      // const latlng = originalData.getLayers()[0].getLatLng();
+      // map.setView(latlng, 15);
+      props.map.setView([45.3405, 6.7533], 10);
+    }
+
     // Ajuster la vue de la carte pour englober les données GeoJSON
-    props.map.fitBounds(geoLayer.value.getBounds());
+    // props.map.fitBounds(geoLayer.value.getBounds());
 
     // Mettre à jour la légende
     addLegend();

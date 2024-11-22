@@ -131,6 +131,7 @@ watch(
       displayOriginalGeometry(); // Méthode qui met à jour la carte avec les coordonnées
     } else {
       console.warn("Coordonnées invalides ou non définies");
+      if (map) map.setView([45.3405, 6.7533], 10);
     }
   },
   { immediate: true, deep: true }
