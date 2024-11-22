@@ -113,6 +113,10 @@ import RucheList from '../components/RucheList.vue'
 import RucheAdd from '../components/RucheAdd.vue'
 import RucheEdit from '../components/RucheEdit.vue'
 
+import EvenementEdit from '../components/EvenementEdit.vue'
+import EvenementAdd from '../components/EvenementAdd.vue'
+import EvenementList from '../components/EvenementList.vue'
+
 import TypeEvenementEdit from '../components/TypeEvenementEdit.vue'
 import TypeEvenementAdd from '../components/TypeEvenementAdd.vue'
 import TypeEvenementList from '../components/TypeEvenementList.vue'
@@ -555,6 +559,24 @@ const router = createRouter({
       path: '/Ruche/edit/:id',
       name: 'editRuche',
       component: RucheEdit,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/Evenements',
+      name: 'evenements',
+      component: EvenementList,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/Evenement/add',
+      name: 'addEvenement',
+      component: EvenementAdd,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/Evenement/edit/:id',
+      name: 'editEvenement',
+      component: EvenementEdit,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
