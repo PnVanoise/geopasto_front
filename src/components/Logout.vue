@@ -1,14 +1,22 @@
 <template>
   <div class="auth_msg">
-    Bonjour <b>{{ username }}</b>
-    <!-- <br />Votre token expire à {{ expirationTime }} -->
+    Bonjour <b>{{ mainStore.username }}</b>
+    <!-- <p v-for="(perms, model) in mainStore.userPermissions" :key="model">
+        <strong>{{ model }}</strong> :
+        <span>{{ perms.join(', ') }}</span>
+      </p> -->
+    <p v-if="mainStore.successMessage" class="success">{{ mainStore.successMessage }}</p>
+    <p v-if="mainStore.errorMessage" class="error">{{ mainStore.errorMessage }}</p>
   </div>
   <button @click="logout">Se déconnecter</button>
+
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
 import { ref, defineEmits, onMounted, onUnmounted } from "vue";
+
+import { useMainStore } from "../store";
 
 // Utiliser le router pour rediriger après la déconnexion
 const router = useRouter();
@@ -18,6 +26,9 @@ const emit = defineEmits(["loggedOut"]);
 
 const username = ref("");
 const expirationTime = ref("");
+
+// Permissions
+const mainStore = useMainStore();
 
 // Fonction pour décoder le token JWT et obtenir l'heure d'expiration
 const decodeToken = (token) => {
@@ -44,6 +55,7 @@ const handleTokenRefreshed = () => {
 };
 
 onMounted(() => {
+  mainStore.fetchUserPermissions();
   loadUserData();
   window.addEventListener("tokenRefreshed", handleTokenRefreshed);
 });

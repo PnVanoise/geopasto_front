@@ -161,6 +161,16 @@ const handleAuthenticated = () => {
 const handleLogout = () => {
   isAuthenticated.value = false; // Met à jour l'état après la déconnexion
 };
+
+// Vérifie si l'utilisateur a accès à un modèle donné
+const hasPermissionForModel = (modelName) => {
+  return computed(() => {
+    return (
+      mainStore.userPermissions[modelName] &&
+      mainStore.userPermissions[modelName].length > 0
+    );
+  });
+};
 </script>
 
 <template>
@@ -212,7 +222,8 @@ const handleLogout = () => {
       >
         <RouterLink to="/ProprietaireFonciers">Propriétaires</RouterLink>
       </div>
-      <div
+      <!-- Teste les persmissions sur le modèle -->
+      <div v-if="hasPermissionForModel('unitepastorale').value"
         :class="[
           'nav-item w3-signal-yellow transparent',
           { active: route.path === '/UnitePastorales' },
@@ -227,7 +238,8 @@ const handleLogout = () => {
       Exploitation <i class="fa fa-caret-down"></i>
     </div>
     <div ref="accExpl" class="w3-hide w3-white w3-card">
-      <div
+    <!-- Teste les persmissions sur le modèle -->
+      <div v-if="hasPermissionForModel('typeconvention').value"
         :class="[
           'nav-item w3-signal-orange transparent',
           { active: route.path === '/TypeConventions' },
