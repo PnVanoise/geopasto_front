@@ -48,6 +48,11 @@ const props = defineProps({
     required: true, // Le type de géométrie doit être spécifié
     validator: (value) => ["Point", "Polygon", "MultiPolygon"].includes(value),
   },
+  referenceGeometry: {
+    type: Object,
+    required: false, // Optionnelle
+    default: () => null, // Pas de référence par défaut
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -58,6 +63,9 @@ let drawnItems;
 let originalData;
 const editingMode = ref(false);
 const jsonCoordinates = ref("");
+
+let referenceData;
+let referenceLayer;
 
 onMounted(async () => {
   await nextTick();
@@ -74,6 +82,13 @@ onMounted(async () => {
   // Initialisation des groupes des polygones
   originalData = new L.FeatureGroup().addTo(map);
   drawnItems = new L.FeatureGroup().addTo(map);
+
+  // Initialisation des couches de référence
+  if (props.referenceGeometry) {
+    referenceLayer = new L.FeatureGroup();
+    displayReferenceGeometry();
+    referenceLayer.addTo(map);
+  }
 
   const myIcon = L.icon({
     iconUrl: `/images/marqueur_rouge.png`, // Utilisation de l'image du dossier public
@@ -121,6 +136,10 @@ onMounted(async () => {
   if (props.modelValue && props.modelValue.coordinates) {
     displayOriginalGeometry();
   }
+
+  if (props.referenceGeometry) {
+    displayReferenceGeometry();
+  }
 });
 
 watch(
@@ -135,6 +154,16 @@ watch(
     }
   },
   { immediate: true, deep: true }
+);
+
+watch(
+  () => props.referenceGeometry,
+  (newReference) => {
+    if (newReference) {
+      displayReferenceGeometry();
+    }
+  },
+  { deep: true }
 );
 // watch(
 //   () => props.modelValue?.geometry,
@@ -157,6 +186,54 @@ watch(
 //   },
 //   { immediate: true, deep: true }
 // );
+
+function displayReferenceGeometry() {
+  if (!props.referenceGeometry) return;
+
+  referenceLayer.clearLayers();
+
+  const rawReference = toRaw(props.referenceGeometry);
+  console.log("RAW referenceGeometry:", rawReference);
+
+  if (rawReference.type === "FeatureCollection") {
+    rawReference.features.forEach((feature) => {
+      if (
+        feature.geometry &&
+        (feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon")
+      ) {
+        let polygons = [];
+        if (feature.geometry.type === "MultiPolygon") {
+          polygons = feature.geometry.coordinates.map((polygon) =>
+            polygon.map((ring) => ring.map(([lng, lat]) => [lat, lng]))
+          );
+        } else if (feature.geometry.type === "Polygon") {
+          polygons = [
+            feature.geometry.coordinates.map((ring) =>
+              ring.map(([lng, lat]) => [lat, lng])
+            ),
+          ];
+        }
+
+        polygons.forEach((polygon) => {
+          L.polygon(polygon, {
+            color: "blue",
+            weight: 1,
+            opacity: 0.8,
+            fill: false,
+            dashArray: "5, 5",
+          }).addTo(referenceLayer);
+        });
+      }
+    });
+
+    const bounds = referenceLayer.getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds);
+    }
+  } else {
+    console.error("referenceGeometry n'est pas un FeatureCollection valide");
+  }
+}
 
 function displayOriginalGeometry() {
   if (!props.modelValue || !props.modelValue.coordinates) {

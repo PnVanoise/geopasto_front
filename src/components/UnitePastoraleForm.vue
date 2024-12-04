@@ -127,6 +127,7 @@
             :key="form.geometry.coordinates"
             v-model="form.geometry"
             :geometryType="'MultiPolygon'"
+            :referenceGeometry="refUPs"
           />
         </div>
       </div>
@@ -150,6 +151,8 @@ const props = defineProps({
   isEdit: Boolean,
   onSubmit: Function,
 });
+
+const refUPs = ref([]);
 
 const situGridColumns = ref(["id_situation", "nom_situation", "situation_active"]);
 const situColumnLabels = ref({
@@ -241,6 +244,27 @@ const fetchQuartiers = () => {
     });
 };
 
+const fetchRefUPs = () => {
+  console.log(`${config.API_BASE_URL}/api/unitePastorale/`);
+  // transformer en features
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/unitePastorale/`)
+    .then((response) => {
+      const data = response.data;
+      console.log("list response data:", response.data);
+      refUPs.value = data;
+      console.log("fetchRefUPs.value:", refUPs.value);
+
+    })
+    .catch((error) => {
+      console.error("There was an error!", error);
+    })
+    .finally(() => {
+      //isLoading.value = false;
+      console.log("fetchQuartiers done");
+    });
+};
+
 const form = ref({ ...props.initialForm });
 
 const router = useRouter();
@@ -305,6 +329,7 @@ watch(
     if (newId) {
       fetchSituations();
       fetchQuartiers();
+      fetchRefUPs();
     }
   }
 );
