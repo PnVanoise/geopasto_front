@@ -3,7 +3,16 @@
 
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
-      <div class="w3-half form-cell">
+      <v-text-field
+        label="Description"
+        density="compact"
+        v-model="form.description"
+        :disabled="props.mode === 'view' || !can('change')"
+        required
+        class="w3-half form-cell"
+      />
+
+      <!-- <div class="w3-half form-cell">
         <label for="desc">Description:</label>
         <input
           class="w3-input w3-border"
@@ -13,8 +22,16 @@
           required
           :disabled="props.mode === 'view' || !can('change')"
         />
-      </div>
-      <div class="w3-half form-cell">
+      </div> -->
+      <v-text-field
+        label="Etat"
+        density="compact"
+        v-model="form.etat"
+        :disabled="props.mode === 'view' || !can('change')"
+        class="w3-half form-cell"
+      />
+      
+      <!-- <div class="w3-half form-cell">
         <label for="etat">Etat:</label>
         <input
           class="w3-input w3-border"
@@ -23,9 +40,11 @@
           v-model="form.etat"
           :disabled="props.mode === 'view' || !can('change')"
         />
-      </div>
+      </div> -->
+    </div>
+    <div class="w3-row form-ligne">
       <!-- next id pour debug -->
-      <div v-if="props.mode === 'add'" class="form-cell">
+      <div v-if="props.mode === 'add'" class="w3-half form-cell">
         (Next ID:
         {{ nextId }}
         )
@@ -33,7 +52,7 @@
     </div>
 
     <div class="grid-container" style="margin-top:1rem;">
-      <label>Commodités associées :</label>
+      <h4>Commodités associées</h4>
       <!-- If parent form is in creation mode, prevent adding child commodites until saved -->
       <template v-if="props.mode === 'add'">
         <div class="w3-panel w3-pale-yellow" style="padding:12px; border:1px solid #ddd;">
@@ -63,10 +82,22 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
+      
+        <v-btn
+        color="info" @click="closeModal"
+        prepend-icon="mdi-arrow-left-circle">
+        Retour</v-btn>
+
+      <!-- <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button> -->
+       <v-btn
+        v-if="props.mode !== 'view'"
+        color="success"
+        type="submit"
+        prepend-icon="mdi-content-save"
+        >{{ btTitle }}</v-btn>
+      <!-- <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
         {{ btTitle }}
-      </button>
+      </button> -->
     </div>
   </form>
 </template>
@@ -180,3 +211,13 @@ watch(
 
 // CRUD of commodites handled by CrudList2; local helpers removed.
 </script>
+
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+</style>

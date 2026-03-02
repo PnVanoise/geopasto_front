@@ -5,8 +5,8 @@
         <strong>{{ model }}</strong> :
         <span>{{ perms.join(', ') }}</span>
       </p> -->
-    <p v-if="mainStore.successMessage" class="success">{{ mainStore.successMessage }}</p>
-    <p v-if="mainStore.errorMessage" class="error">{{ mainStore.errorMessage }}</p>
+    <!-- <p v-if="mainStore.successMessage" class="success">{{ mainStore.successMessage }}</p>
+    <p v-if="mainStore.errorMessage" class="error">{{ mainStore.errorMessage }}</p> -->
   </div>
   <button @click="logout">Se déconnecter</button>
 

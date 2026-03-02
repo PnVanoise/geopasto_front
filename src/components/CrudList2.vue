@@ -3,11 +3,16 @@
     <h2 v-if="props.showTitle" class="w3-center">{{ title }}</h2>
 
     <div v-if="props.showHeader" class="header-actions">
-      <input
-        v-if="props.showSearch"
-        type="text"
-        v-model="searchQuery"
-        placeholder="Recherche..."
+      <v-text-field
+      density="compact"
+          v-if="props.showSearch"
+          class="search-field"
+          v-model="searchQuery"
+          label="Recherche"
+          dense
+          hide-details
+          clearable
+          append-inner-icon="mdi-magnify"
       />
       <!-- Rendu automatique des filtres -->
       <template v-if="props.showFilters" v-for="filter in props.filters" :key="filter.key">
@@ -37,14 +42,22 @@
         </label>
       </template>
 
-      <button
+      
+      <v-btn
+        v-if="props.showAddButton && !props.viewOnly && (crud.can('add') || props.forceAdd)"
+        color="info"
+        @click="crud.openAdd"
+        prepend-icon="mdi-plus-circle">
+        Ajouter</v-btn>
+      
+      <!-- <button
         type="button"
         class="w3-button add-btn"
         v-if="props.showAddButton && !props.viewOnly && (crud.can('add') || props.forceAdd)"
         @click="crud.openAdd"
       >
-        <font-awesome-icon icon="plus" /> Ajouter
-      </button>
+          <font-awesome-icon icon="plus" /> Ajouter
+      </button> -->
     </div>
 
     <Grid3
@@ -206,4 +219,55 @@ function handleDelete(item) {
 
 <style scoped>
 
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Search occupies one third on the left; Add button aligned to the right */
+.header-actions .search-field {
+  flex: 0 0 33%;
+  min-width: 160px;
+}
+
+.header-actions .add-btn {
+  margin-left: auto !important;
+  flex: 0 0 auto;
+  min-width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+
+/* Make sure Vuetify field height aligns with the button */
+.header-actions .search-field .v-field,
+.header-actions .search-field .v-text-field {
+  height: 40px;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 600px) {
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .header-actions .search-field,
+  .header-actions .add-btn {
+    flex: 1 1 auto;
+    margin-left: 0;
+  }
+}
 </style>
