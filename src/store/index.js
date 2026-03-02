@@ -1,16 +1,31 @@
 // store/index.js
 import { defineStore } from 'pinia';
-import { errorMessages } from 'vue/compiler-sfc';
+
 import auth from '../../auth';
 
-export const useMainStore = defineStore('main', {
+export const useMainStore = defineStore("main", {
     state: () => ({
+        user: JSON.parse(localStorage.getItem("user")) || null,
         successMessage: '',
         errorMessage: '',
+        username: null,
         userPermissions: {},
-        userName: '',
     }),
+
+    getters: {
+        isAuthenticated: (state) => !!state.user?.access,
+    },
+
     actions: {
+        setUser(userData) {
+            this.user = userData;
+            console.log("Utilisateur connecté :", this.user);
+            localStorage.setItem("user", JSON.stringify(userData));
+        },
+        logout() {
+            this.user = null;
+            localStorage.removeItem("user");
+        },
         setSuccessMessage(message) {
             this.successMessage = message;
             setTimeout(() => {
@@ -25,27 +40,32 @@ export const useMainStore = defineStore('main', {
         },
         async fetchUserPermissions() {
             try {
-                const response = await auth.axiosInstance.get('http://151.80.250.138:8000/api/userpermissions/');
-                const data = response.data;
-                this.userPermissions = data.permissions_by_model; // Stocker les permissions groupées par modèle
-                this.username = data.username;                   // Stocker le nom de l'utilisateur
+                const response = await auth.axiosInstance.get("/userpermissions/");
+                // console.log("FetchPermissions : Réponse API permissions :", response.data);
+                this.username = response.data.username;
+                this.userPermissions = response.data.permissions_by_model;
+
+                // console.log("Stocké dans le store :", this);
+
             } catch (error) {
-                // Vérifiez si l'erreur a une réponse
-                if (error.response) {
-                    // Une réponse a été reçue, mais le serveur a renvoyé un code d'erreur (4xx, 5xx)
-                    console.error('Error fetching user permissions:', error.response.data);
-                    this.setErrorMessage(`Failed to fetch user permissions: ${error.response.status} - ${error.response.statusText}`);
-                } else if (error.request) {
-                    // La requête a été envoyée, mais aucune réponse n'a été reçue
-                    console.error('Error fetching user permissions: No response received', error.request);
-                    this.setErrorMessage('Failed to fetch user permissions: No response from server.');
-                } else {
-                    // Une autre erreur est survenue lors de la configuration de la requête
-                    console.error('Error fetching user permissions:', error.message);
-                    this.setErrorMessage(`Failed to fetch user permissions: ${error.message}`);
-                }
+                console.error("Erreur lors du chargement des permissions :", error);
+                // this.setErrorMessage("Impossible de charger les permissions.");
             }
         },
+        hasPermission(model, actionOrFullPermission) {
+            // actionOrFullPermission peut être 'add' ou 'add_abridurgence'
+            if (!this.userPermissions) return false
 
+            // si on reçoit l'action courte (add|view|change|delete)
+            if (!actionOrFullPermission.includes('_')) {
+                const full = `${actionOrFullPermission}_${model}`
+                const perms = this.userPermissions[model] || []
+                return perms.includes(full)
+            }
+
+            // si on reçoit la permission complète
+            const perms = this.userPermissions[model] || []
+            return perms.includes(actionOrFullPermission)
+        },
     },
 });

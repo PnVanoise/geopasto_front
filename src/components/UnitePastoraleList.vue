@@ -24,6 +24,7 @@
             :bgColor="'#f7ba0b'"
             :columnLabels="columnLabels"
             @edit="onEdit"
+            @view="onView"
             @delete="onDelete"
           >
           </Grid>
@@ -81,9 +82,8 @@ const router = useRouter();
 // Data --> props
 // Zone de recherche et grille
 const searchQuery = ref("");
-const gridColumns = ref(["code_up", "nom_up", "annee_version"]);
+const gridColumns = ref(["nom_up", "annee_version"]);
 const columnLabels = ref({
-  code_up: "Code UP",
   nom_up: "Nom",
   annee_version: "Année",
 });
@@ -132,6 +132,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id);
 
   router.push(`/UnitePastorale/edit/${entry.id}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/UnitePastorale/edit/${entry.id}`,
+    query: { readonly: 'true'}
+  });
 }
 
 // Méthode pour gérer la suppression

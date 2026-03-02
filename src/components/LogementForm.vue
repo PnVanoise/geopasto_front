@@ -16,6 +16,10 @@
                     <input class="w3-input w3-border" v-model="form.properties.logement_code" id="logement_code"></input>
                 </div>
                 <div class="w3-third form-cell">
+                    <label for="nom_logement">Nom:</label>
+                    <input class="w3-input w3-border" v-model="form.properties.nom_logement" id="nom_logement"></input>
+                </div>
+                <div class="w3-third form-cell">
                     <label for="statut">Statut:</label>
                     <select class="w3-input w3-border" v-model="form.properties.statut" id="statut">
                         <option v-for="choice in choices.statut" :key="choice.value" :value="choice.value">
@@ -23,6 +27,21 @@
                         </option>
                     </select>
                 </div>
+                <div class="w3-half form-cell">
+                    <label for="unitepastorale">Unité pastorale:</label>
+                    <select
+                        class="w3-input w3-border"
+                        v-model="form.properties.unite_pastorale"
+                        id="unitepastorale"
+                    >
+                        <option :value="null">-- Choisir une UP --</option>
+                        <option v-for="up in ups.features" :key="up.id" :value="up.id">
+                        {{ up.properties.nom_up }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="w3-row form-ligne">
                 <div class="w3-third form-cell">
                     <label for="acces_final">Accès final:</label>
                     <select class="w3-input w3-border" v-model="form.properties.acces_final" id="acces_final">
@@ -31,8 +50,6 @@
                         </option>
                     </select>
                 </div>
-            </div>
-            <div class="w3-row form-ligne">
                 <div class="w3-third form-cell">
                     <label for="propriete">Propriété:</label>
                     <select class="w3-input w3-border" v-model="form.properties.propriete" id="propriete">
@@ -49,6 +66,8 @@
                         </option>
                     </select>
                 </div>
+            </div>
+            <div class="w3-row form-ligne">
                 <div class="w3-third form-cell">
                     <label for="multiusage">Multiusage:</label>
                     <select class="w3-input w3-border" v-model="form.properties.multiusage" id="multiusage">
@@ -57,8 +76,6 @@
                         </option>
                     </select>
                 </div>
-            </div>
-            <div class="w3-row form-ligne">
                 <div class="w3-third form-cell">
                     <label for="activite_laitiere">Activité laitière (sur l'UP):</label>
                     <div class="select-container">
@@ -304,6 +321,7 @@ const commColumnLabels = ref({
     quantite: 'Quantité',
 });
 
+const ups = ref([]);
 
 const goToAddCommodite = () => {
   // Utilisation de l'ID de l'UP pour la navigation
@@ -347,6 +365,18 @@ const allTabsVisited = computed(() => {
 onMounted(() => {
     fetchChoices();
     openTab('tab1');
+    auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/unitePastorale/`)
+    .then((response) => {
+      ups.value = response.data;
+      console.log("ups:", ups.value);
+    })
+    .catch((error) => {
+      console.error(
+        "Erreur lors de la récupération de la liste des unités pastorales",
+        error
+      );
+    });
 });
 
 watch(() => props.initialForm, (newForm) => {

@@ -1,7 +1,11 @@
 <template>
   <div>
-    <h1>Éditer une convention</h1>
-    <ConventionForm :initialForm="form" :isEdit="true" :onSubmit="submitForm" />
+    <h1>Éditer une convention d'exploitation</h1>
+    <ConventionForm 
+      :initialForm="form"
+      :isEdit="true"
+      :onSubmit="submitForm"
+    />
   </div>
 </template>
 
@@ -12,12 +16,12 @@ import { useRouter, useRoute } from "vue-router";
 import auth from "../../auth";
 import config from "../../config";
 import { useMainStore } from "../store";
-
 import ConventionForm from "./ConventionForm.vue";
 
 const form = ref({
   id: null,
   properties: {
+    type_convention: null,
     surface_location: "",
     surface_exploitable: "",
     date_debut: "",
@@ -26,6 +30,10 @@ const form = ref({
     effectif_ovin: "",
     effectif_caprin: "",
     effectif_porcin: "",
+    debut_periode_expl: "",
+    fin_periode_expl: "",
+    up: null,
+    exploitant: null,
   },
   geometry: {
     type: "Polygon",
@@ -42,11 +50,15 @@ const fetchConvention = () => {
   auth.axiosInstance
     .get(`${config.API_BASE_URL}/api/conventionExploitation/${id}/`)
     .then((response) => {
-      console.log("response data : ", response.data);
-      form.value.id = response.data.id;
-      form.value.properties = response.data.properties;
-      form.value.geometry = response.data.geometry;
-      console.log("form properties : ", form.value);
+      const data = response.data
+      
+      form.value.id = data.id;
+      form.value.properties = data.properties;
+      form.value.geometry = data.geometry;
+
+      console.log(
+        "Form loaded for editing: ",
+        form.value);
     })
     .catch((error) => {
       mainStore.setErrorMessage("Erreur de lecture de la convention.");

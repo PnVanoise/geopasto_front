@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="commodites"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#154889'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="commodites" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#154889'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -50,10 +43,9 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_commodite", "description"]);
+const gridColumns = ref(["description"]);
 const columnLabels = ref({
-  id_commodite: "ID",
-  description: "Desc.",
+  description: "Description",
 });
 
 const fetchCommodites = () => {
@@ -83,6 +75,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_commodite);
 
   router.push(`/Commodite/edit/${entry.id_commodite}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/Commodite/edit/${entry.id_commodite}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression

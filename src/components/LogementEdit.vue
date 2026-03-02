@@ -52,11 +52,6 @@ const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
 const mainStore = useMainStore();
-console.log("id : ", id);
-
-// const router = useRouter();
-
-console.log("LOGEMENT EDIT");
 
 const fetchLogement = () => {
   console.log("fetchLogement");

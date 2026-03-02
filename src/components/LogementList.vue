@@ -18,10 +18,10 @@
         </div>
         <div class="grid-container">
           <Grid
-            :data="features"
+            :data="logementsWithDesc"
             :columns="gridColumns"
             :filter-key="searchQuery"
-            :bgColor="'#9b2423'"
+            :bgColor="'#005187'"
             :columnLabels="columnLabels"
             @edit="onEdit"
             @delete="onDelete"
@@ -60,17 +60,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
 
-import MapList from "./MapList.vue";
 import Grid from "./Grid.vue";
 import MapContainer from "./ListMap/MapContainer.vue";
 import BaseLayersControl from "./ListMap/BaseLayersControl.vue";
 import GeoJsonLayer from "./ListMap/GeoJsonLayer.vue";
-import LegendControl from "./ListMap/LegendControl.vue";
 
 import config from "../../config";
 
@@ -81,10 +79,11 @@ const mapRef = ref(null);
 const router = useRouter();
 
 const searchQuery = ref("");
-const gridColumns = ref(["logement_code", "nom", "statut"]);
+const gridColumns = ref(["logement_code", "nom_logement", "nom_up", "statut"]);
 const columnLabels = ref({
   logement_code: "Code",
-  nom: "Nom",
+  nom_logement: "Nom",
+  nom_up : "UP",
   statut: "Statut",
 });
 const features = ref([]);
@@ -117,20 +116,13 @@ const legendContent = `
 
 console.log("symbolStyle:", symbolStyle);
 
-const logementStyle = ref({
-  radius: 8,
-  fillColor: "#ff7800",
-  color: "#000",
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.8,
+const logementsWithDesc = computed(() => {
+  console.log("features: ", features.value);
+  return features.value.map(exp => ({
+    ...exp,
+    nom_up: exp.unite_pastorale_detail?.nom_up || "",
+  }));
 });
-
-const legendHtml = ref(null);
-legendHtml.value = `
-        <h4>Logements pastoraux<br>en coeur de Parc</h4>
-        <i class="circle" style="background: rgba(255,120,0,0.8);"></i> Logement
-`;
 
 const fetchLogements = () => {
   auth.axiosInstance

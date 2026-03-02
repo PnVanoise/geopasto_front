@@ -9,15 +9,28 @@
           id="desc"
           v-model="form.description"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
         <label for="espece">Espèce:</label>
-        <input class="w3-input w3-border" type="text" id="espece" v-model="form.espece" />
+        <input
+          class="w3-input w3-border"
+          type="text"
+          id="espece"
+          v-model="form.espece"
+          :disabled="props.isReadOnly"
+        />
       </div>
       <div class="w3-half form-cell">
         <label for="race">Race:</label>
-        <input class="w3-input w3-border" type="text" id="race" v-model="form.race" />
+        <input
+          class="w3-input w3-border"
+          type="text"
+          id="race"
+          v-model="form.race"
+          :disabled="props.isReadOnly"
+        />
       </div>
       <div class="w3-half form-cell">
         <label for="production">Production:</label>
@@ -26,6 +39,7 @@
           type="text"
           id="production"
           v-model="form.production"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -35,11 +49,17 @@
           type="text"
           id="stadeM"
           v-model="form.stade_maturite"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
         <label for="pension">En pension:</label>
-        <select class="w3-input w3-border" v-model="form.pension" id="pension">
+        <select
+          class="w3-input w3-border"
+          v-model="form.pension"
+          id="pension"
+          :disabled="props.isReadOnly"
+        >
           <option value="En totalité">Tous les animaux</option>
           <option value="Aucun animal">Aucun animal</option>
           <option value="Mix">Mix</option>
@@ -52,7 +72,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -65,6 +85,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 

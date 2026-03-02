@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="typeMesures"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="typeMesures" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -50,10 +43,9 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_type_mesure", "description"]);
+const gridColumns = ref(["description"]);
 const columnLabels = ref({
-  id_type_mesure: "ID",
-  description: "Desc.",
+  description: "Description",
 });
 
 const fetchTypeMesures = () => {
@@ -83,6 +75,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_type_mesure);
 
   router.push(`/TypeMesure/edit/${entry.id_type_mesure}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/TypeMesure/edit/${entry.id_type_mesure}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression

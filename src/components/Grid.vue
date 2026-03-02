@@ -7,9 +7,16 @@ const props = defineProps({
   filterKey: String,
   bgColor: String,
   columnLabels: Object,
+  actions: {
+    type: Object,
+    default: () => ({
+      view: true,
+      edit: true,
+      delete: true,
+    })}
 });
 
-const emit = defineEmits(["edit", "delete"]);
+const emit = defineEmits(["edit", "delete", "view"]);
 
 const sortKey = ref("");
 const sortOrders = ref(props.columns.reduce((o, key) => ((o[key] = 1), o), {}));
@@ -55,6 +62,29 @@ function handleDelete(entry) {
 
 function handleView(entry) {
   console.log("TODO view entry", entry);
+  emit("view", entry);
+}
+
+
+const showDeleteModal = ref(false);
+const entryToDelete = ref(null);
+
+function confirmDelete(entry) {
+  entryToDelete.value = entry;
+  showDeleteModal.value = true;
+}
+
+function cancelDelete() {
+  entryToDelete.value = null;
+  showDeleteModal.value = false;
+}
+
+function performDelete() {
+  if (entryToDelete.value) {
+    handleDelete(entryToDelete.value);
+    showDeleteModal.value = false;
+    entryToDelete.value = null;
+  }
 }
 </script>
 
@@ -91,18 +121,48 @@ function handleView(entry) {
             </template>
           </td>
           <td>
-            <font-awesome-icon icon="edit" class="icon-edit" @click="handleEdit(entry)" />
-            <font-awesome-icon
-              icon="trash"
-              class="icon-delete"
-              @click="handleDelete(entry)"
-            />
+            <template v-if="props.actions.view">
+              <font-awesome-icon
+                icon="eye"
+                class="icon-view"
+                title="Voir les détails"
+                @click="handleView(entry)"
+              />
+            </template>
+
+            <template v-if="props.actions.edit">
+              <font-awesome-icon
+                icon="edit"
+                class="icon-edit"
+                title="Modifier"
+                @click="handleEdit(entry)"
+              />
+            </template>
+
+            <template v-if="props.actions.delete">
+              <font-awesome-icon
+                icon="trash"
+                class="icon-delete"
+                title="Supprimer"
+                @click="confirmDelete(entry)"
+              />
+            </template>
           </td>
         </tr>
       </tbody>
     </table>
     <p v-else>Aucun résultat.</p>
   </div>
+  <div v-if="showDeleteModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Confirmer la suppression</h3>
+    <p>Êtes-vous sûr de vouloir supprimer cet enregistrement ?</p>
+    <div class="modal-actions">
+      <button @click="performDelete" class="modal-confirm">Oui, supprimer</button>
+      <button @click="cancelDelete" class="modal-cancel">Annuler</button>
+    </div>
+  </div>
+</div>
 </template>
 
 <style>
@@ -209,5 +269,47 @@ th.active .arrow {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 4px solid #fff;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 300px;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-confirm {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.modal-cancel {
+  background-color: #bdc3c7;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
 }
 </style>

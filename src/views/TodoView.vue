@@ -11,41 +11,6 @@
     </div>
 </template>
 
-<!-- Options API -->
-<!-- <script>
-import CounterMixin from '../mixins/CounterMixin.js';
-
-export default {
-    mixins: [CounterMixin],
-    data() {
-        return {
-            tasks: ["Write my posts", "Go for a walk", "Meet my friends", "Buy fruit"],
-            newItemText: ""
-        }
-    },
-    mounted() {
-        this.set(this.tasks.length)
-    },
-    methods: {
-        addNewTodo() {
-            if (this.newItemText != "") {
-                this.tasks.unshift(this.newItemText)
-                this.increment()
-            }
-            this.newItemText = ""
-        },
-        removeTodo() {
-            this.tasks.pop()
-            this.decrement()
-        },
-        removeAllTodos() {
-            this.tasks = []
-            this.reset()
-        }
-    }
-}
-</script> -->
-
 <!-- Composition API -->
 <script>
 import { ref, onMounted } from 'vue';

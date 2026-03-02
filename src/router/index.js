@@ -1,37 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import AboutView from '../views/AboutView.vue'
-import AboutView2 from '../views/AboutView2.vue'
-import MapView from '../views/MapView.vue'
-import AlpageView from '../views/AlpageView.vue'
-import TodoView from '../views/TodoView.vue'
+import { useMainStore } from '../store'
 
 import Login from '../components/Login.vue'
-import Logout from '../components/Logout.vue'
 
-import LogementList from '../components/LogementList.vue'
-import LogementEdit from '../components/LogementEdit.vue'
-import LogementAdd from '../components/LogementAdd.vue'
-
-import AlpageList from '../components/AlpageList.vue'
-import AlpageEdit from '../components/AlpageEdit.vue'
-import AlpageAdd from '../components/AlpageAdd.vue'
-
-import TypeEquipementAlpageList from '../components/TypeEquipementAlpageList.vue'
-import TypeEquipementAlpageEdit from '../components/TypeEquipementAlpageEdit.vue'
-import TypeEquipementAlpageAdd from '../components/TypeEquipementAlpageAdd.vue'
-
-import EquipementList from '../components/EquipementList.vue'
-import EquipementEdit from '../components/EquipementEdit.vue'
-import EquipementAdd from '../components/EquipementAdd.vue'
-
-import QuartieralpageList from '../components/QuartieralpageList.vue'
-import QuartieralpageView from '../components/QuartieralpageView.vue'
-
-import TestFiltre from '../components/TestFiltre.vue'
-import TestForm from '../components/TestForm.vue'
-
-// import TestMap from '../components/TestMap.vue'
+import EleveurList2 from '../components/EleveurList2.vue'
+import ExploitantList2 from '../components/ExploitantList2.vue'
+import SubventionList2 from '../components/SubventionList2.vue'
+import AbriDUrgenceList2 from '../components/AbriDUrgenceList2.vue'
+import EspeceList2 from '../components/EspeceList2.vue'
+import ProductionList2 from '../components/ProductionList2.vue'
+import CategoriePensionList2 from '../components/CategoriePensionList2.vue'
+import CategorieAnimauxList2 from '../components/CategorieAnimauxList2.vue'
+import RaceList2 from '../components/RaceList2.vue'
+import BergerList2 from '../components/BergerList2.vue'
+import GardeTroupeauList2 from '../components/GardeTroupeauList2.vue'
+import CommoditeList2 from '../components/CommoditeList2.vue'
+import TypeDExploitantList2 from '../components/TypeDExploitantList2.vue'
+import TypeEquipementList2 from '../components/TypeEquipementList2.vue'
+import TypeDeConventionList2 from '../components/TypeDeConventionList2.vue'
+import TypeCheptelList2 from '../components/TypeCheptelList2.vue'
+import TypeDeSuiviList2 from '../components/TypeDeSuiviList2.vue'
+import TypeEvenementList2 from '../components/TypeEvenementList2.vue'
+import EleverList2 from '../components/EleverList2.vue'
+import TypeDeMesureList2 from '../components/TypeDeMesureList2.vue'
 
 import UnitePastoraleList from '../components/UnitePastoraleList.vue'
 import UnitePastoraleAdd from '../components/UnitePastoraleAdd.vue'
@@ -57,10 +48,6 @@ import PlanDeSuiviList from '../components/PlanDeSuiviList.vue'
 import PlanDeSuiviAdd from '../components/PlanDeSuiviAdd.vue'
 import PlanDeSuiviEdit from '../components/PlanDeSuiviEdit.vue'
 
-import TypeDeConventionList from '../components/TypeDeConventionList.vue'
-import TypeDeConventionAdd from '../components/TypeDeConventionAdd.vue'
-import TypeDeConventionEdit from '../components/TypeDeConventionEdit.vue'
-
 import ConventionList from '../components/ConventionList.vue'
 import ConventionAdd from '../components/ConventionAdd.vue'
 import ConventionEdit from '../components/ConventionEdit.vue'
@@ -73,10 +60,6 @@ import ExploiterList from '../components/ExploiterList.vue'
 import ExploiterAdd from '../components/ExploiterAdd.vue'
 import ExploiterEdit from '../components/ExploiterEdit.vue'
 
-import TypeDeMesureList from '../components/TypeDeMesureList.vue'
-import TypeDeMesureEdit from '../components/TypeDeMesureEdit.vue'
-import TypeDeMesureAdd from '../components/TypeDeMesureAdd.vue'
-
 import MesureDePlanList from '../components/MesureDePlanList.vue'
 import MesureDePlanAdd from '../components/MesureDePlanAdd.vue'
 import MesureDePlanEdit from '../components/MesureDePlanEdit.vue'
@@ -84,14 +67,6 @@ import MesureDePlanEdit from '../components/MesureDePlanEdit.vue'
 import EleveurList from '../components/EleveurList.vue'
 import EleveurAdd from '../components/EleveurAdd.vue'
 import EleveurEdit from '../components/EleveurEdit.vue'
-
-import ExploitantList from '../components/ExploitantList.vue'
-import ExploitantAdd from '../components/ExploitantAdd.vue'
-import ExploitantEdit from '../components/ExploitantEdit.vue'
-
-import SubventionList from '../components/SubventionList.vue'
-import SubventionAdd from '../components/SubventionAdd.vue'
-import SubventionEdit from '../components/SubventionEdit.vue'
 
 import AbriDUrgenceList from '../components/AbriDUrgenceList.vue'
 import AbriDUrgenceAdd from '../components/AbriDUrgenceAdd.vue'
@@ -101,14 +76,6 @@ import PretAbriList from '../components/PretAbriList.vue'
 import PretAbriAdd from '../components/PretAbriAdd.vue'
 import PretAbriEdit from '../components/PretAbriEdit.vue'
 
-import BergerList from '../components/BergerList.vue'
-import BergerAdd from '../components/BergerAdd.vue'
-import BergerEdit from '../components/BergerEdit.vue'
-
-import TypeCheptelList from '../components/TypeCheptelList.vue'
-import TypeCheptelAdd from '../components/TypeCheptelAdd.vue'
-import TypeCheptelEdit from '../components/TypeCheptelEdit.vue'
-
 import RucheList from '../components/RucheList.vue'
 import RucheAdd from '../components/RucheAdd.vue'
 import RucheEdit from '../components/RucheEdit.vue'
@@ -116,26 +83,23 @@ import RucheEdit from '../components/RucheEdit.vue'
 import EvenementEdit from '../components/EvenementEdit.vue'
 import EvenementAdd from '../components/EvenementAdd.vue'
 import EvenementList from '../components/EvenementList.vue'
-
-import TypeEvenementEdit from '../components/TypeEvenementEdit.vue'
-import TypeEvenementAdd from '../components/TypeEvenementAdd.vue'
-import TypeEvenementList from '../components/TypeEvenementList.vue'
-
-import GardeTroupeauList from '../components/GardeTroupeauList.vue'
-import GardeTroupeauAdd from '../components/GardeTroupeauAdd.vue'
-import GardeTroupeauEdit from '../components/GardeTroupeauEdit.vue'
-
-import EleverList from '../components/EleverList.vue'
-import EleverAdd from '../components/EleverAdd.vue'
-import EleverEdit from '../components/EleverEdit.vue'
-
-import CommoditeList from '../components/CommoditeList.vue'
-import CommoditeAdd from '../components/CommoditeAdd.vue'
-import CommoditeEdit from '../components/CommoditeEdit.vue'
+import EventForm from '../components/EventForm.vue'
+import EventList2 from '../components/EventList2.vue'
 
 import LogementCommoditeList from '../components/LogementCommoditeList.vue'
 import LogementCommoditeAdd from '../components/LogementCommoditeAdd.vue'
 import LogementCommoditeEdit from '../components/LogementCommoditeEdit.vue'
+
+import LogementList from '../components/LogementList.vue'
+import LogementEdit from '../components/LogementEdit.vue'
+import LogementAdd from '../components/LogementAdd.vue'
+
+import EquipementList from '../components/EquipementList.vue'
+import EquipementEdit from '../components/EquipementEdit.vue'
+import EquipementAdd from '../components/EquipementAdd.vue'
+
+import QuartieralpageView from '../components/QuartieralpageView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -145,6 +109,11 @@ const router = createRouter({
       name: 'home',
       component: UnitePastoraleList,
       meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/UnitePastorales',
@@ -235,6 +204,12 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
+      path: '/TypeSuivis2',
+      name: 'typesuivis2',
+      component: TypeDeSuiviList2,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
       path: '/TypeSuivis',
       name: 'typesuivis',
       component: TypeDeSuiviList,
@@ -271,21 +246,9 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeMesures',
-      name: 'typeMesures',
-      component: TypeDeMesureList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/TypeMesure/add',
-      name: 'addTypeMesure',
-      component: TypeDeMesureAdd,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/TypeMesure/edit/:id',
-      name: 'editTypeMesure',
-      component: TypeDeMesureEdit,
+      path: '/TypeMesures2',
+      name: 'typeMesures2',
+      component: TypeDeMesureList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
@@ -307,21 +270,9 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeConventions',
-      name: 'typeconventions',
-      component: TypeDeConventionList,
-    },
-    {
-      path: '/TypeConvention/add',
-      name: 'addTypeConvention',
-      component: TypeDeConventionAdd,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/TypeConvention/edit/:id',
-      name: 'editTypeConvention',
-      component: TypeDeConventionEdit,
-      meta: { requiresAuth: true },  // Route protégée
+      path: '/TypeConventions2',
+      name: 'typeconventions2',
+      component: TypeDeConventionList2,
     },
     {
       path: '/Conventions',
@@ -378,6 +329,12 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
+      path: '/Eleveurs2',
+      name: 'eleveurs2',
+      component: EleveurList2,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
       path: '/Eleveurs',
       name: 'eleveurs',
       component: EleveurList,
@@ -394,38 +351,23 @@ const router = createRouter({
       component: EleveurEdit,
       meta: { requiresAuth: true },  // Route protégée
     },
+
     {
-      path: '/Exploitants',
-      name: 'exploitants',
-      component: ExploitantList,
+      path: '/TypeExploitants2',
+      name: 'typeExploitants2',
+      component: TypeDExploitantList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/Exploitant/add',
-      name: 'addExploitant',
-      component: ExploitantAdd,
-    },
-    {
-      path: '/Exploitant/edit/:id',
-      name: 'editExploitant',
-      component: ExploitantEdit,
+      path: '/Exploitants2',
+      name: 'exploitants2',
+      component: ExploitantList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/Subventions',
-      name: 'subventions',
-      component: SubventionList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Subvention/add',
-      name: 'addSubvention',
-      component: SubventionAdd,
-    },
-    {
-      path: '/Subvention/edit/:id',
-      name: 'editSubvention',
-      component: SubventionEdit,
+      path: '/Subventions2',
+      name: 'subventions2',
+      component: SubventionList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
@@ -436,14 +378,20 @@ const router = createRouter({
     },
     {
       path: '/AbriUrgence/add',
-      name: 'addAbri',
+      name: 'addAbriUrgence',
       component: AbriDUrgenceAdd,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
       path: '/AbriUrgence/edit/:id',
-      name: 'editAbri',
+      name: 'editAbriUrgence',
       component: AbriDUrgenceEdit,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/AbriUrgences2',
+      name: 'abris2',
+      component: AbriDUrgenceList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
@@ -465,84 +413,79 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/Bergers',
-      name: 'bergers',
-      component: BergerList,
+      path: '/Especes2',
+      name: 'especes2',
+      component: EspeceList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/Berger/add',
-      name: 'addBerger',
-      component: BergerAdd,
+      path : "/Productions2",
+      name : "productions2",
+      component : ProductionList2
+    },
+    {
+      path: '/CategoriesPension2',
+      name: 'categories_pension2',
+      component: CategoriePensionList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/Berger/edit/:id',
-      name: 'editBerger',
-      component: BergerEdit,
+      path: '/CategoriesAnimaux2',
+      name: 'categories_animaux2',
+      component: CategorieAnimauxList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeCheptels',
-      name: 'typecheptels',
-      component: TypeCheptelList,
+      path: '/Races2',
+      name: 'races2',
+      component: RaceList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeCheptel/add',
-      name: 'addTypeCheptel',
-      component: TypeCheptelAdd,
+      path: '/Bergers2',
+      name: 'bergers2',
+      component: BergerList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeCheptel/edit/:id',
-      name: 'editTypeCheptel',
-      component: TypeCheptelEdit,
+      path: '/TypeCheptels2',
+      name: 'typecheptels2',
+      component: TypeCheptelList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/GardeTroupeaux',
-      name: 'gardetroupeaux',
-      component: GardeTroupeauList,
+      path: '/GardeTroupeaux2',
+      name: 'gardetroupeaux2',
+      component: GardeTroupeauList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/GardeTroupeau/add',
-      name: 'addGardeTroupeau',
-      component: GardeTroupeauAdd,
+      path: '/Elevers2',
+      name: 'elevers2',
+      component: EleverList2,
       meta: { requiresAuth: true },  // Route protégée
     },
-    {
-      path: '/GardeTroupeau/edit/:id',
-      name: 'editGardeTroupeau',
-      component: GardeTroupeauEdit,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Elevers',
-      name: 'elevers',
-      component: EleverList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Elever/add',
-      name: 'addElever',
-      component: EleverAdd,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Elever/add/:situId',
-      name: 'addEleverWithSituId',
-      component: EleverAdd,
-      meta: { requiresAuth: true },  // Route protégée
-      props: true
-    },
-    {
-      path: '/Elever/edit/:id',
-      name: 'editElever',
-      component: EleverEdit,
-      meta: { requiresAuth: true },  // Route protégée
-    },
+    // {
+    //   path: '/Elever/add',
+    //   name: 'addElever',
+    //   component: EleverAdd,
+    //   meta: { requiresAuth: true },  // Route protégée
+    // },
+    // {
+    //   // @param : situation id (pour enregistrement cheptel)
+    //   // @param : exploitant id (pour sélection des éleveurs)
+    //   path: '/Elever/add/:situId/:explId',
+    //   name: 'addEleverWithSituId',
+    //   component: EleverAdd,
+    //   meta: { requiresAuth: true },  // Route protégée
+    //   props: true
+    // },
+    // {
+    //   path: '/Elever/edit/:id',
+    //   name: 'editElever',
+    //   component: EleverEdit,
+    //   meta: { requiresAuth: true },  // Route protégée
+    // },
     {
       path: '/Ruches',
       name: 'ruches',
@@ -568,10 +511,22 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
+      path: '/Evenements2',
+      name: 'evenements2',
+      component: EventList2,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/Evenement/add',
       name: 'addEvenement',
       component: EvenementAdd,
       meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/Evenement/create-map',
+      name: 'addEvenementMap',
+      component: EventForm,
+      meta: { requiresAuth: true },
     },
     {
       path: '/Evenement/edit/:id',
@@ -580,37 +535,20 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeEvenements',
-      name: 'typeevenements',
-      component: TypeEvenementList,
+      path: '/TypeEvenements2',
+      name: 'typeevenements2',
+      component: TypeEvenementList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeEvenement/add',
-      name: 'addTypeEvenement',
-      component: TypeEvenementAdd,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/TypeEvenement/edit/:id',
-      name: 'editTypeEvenement',
-      component: TypeEvenementEdit,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Alpages',
-      name: 'alpages',
-      component: AlpageList
-    },
-    {
-      path: '/Alpage/add',
-      name: 'addAlpages',
-      component: AlpageAdd
-    },
-    {
-      path: '/Alpage/edit/:id',
-      name: 'editAlpage',
-      component: AlpageEdit
+      path: '/TypeEquipements2',
+      name: 'typeequipements2',
+      component: TypeEquipementList2,
+      meta: {
+        modelName: 'typeequipement',
+        requiredPermission: 'view_typeequipement',
+        requiresAuth: true
+      },  // Route protégée
     },
     {
       path: '/Logements',
@@ -629,20 +567,10 @@ const router = createRouter({
       component: LogementEdit
     },
     {
-      path: '/Commodites',
-      name: 'commodites',
-      component: CommoditeList,
+      path: '/Commodites2',
+      name: 'commodites2',
+      component: CommoditeList2,
       meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Commodite/add',
-      name: 'addCommodite',
-      component: CommoditeAdd
-    },
-    {
-      path: '/Commodite/edit/:id',
-      name: 'editCommodite',
-      component: CommoditeEdit
     },
     {
       path: '/LogementCommodites',
@@ -668,22 +596,6 @@ const router = createRouter({
       component: LogementCommoditeEdit
     },
     {
-      path: '/TypeEquipementAlpages',
-      name: 'typeEquipementAlpages',
-      component: TypeEquipementAlpageList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/TypeEquipementAlpage/add',
-      name: 'addTypeEquipementAlpage',
-      component: TypeEquipementAlpageAdd
-    },
-    {
-      path: '/TypeEquipementAlpage/edit/:id',
-      name: 'editTypeEquipementAlpage',
-      component: TypeEquipementAlpageEdit
-    },
-    {
       path: '/Equipements',
       name: 'equipements',
       component: EquipementList,
@@ -700,56 +612,9 @@ const router = createRouter({
       component: EquipementEdit
     },
     {
-      path: '/TestFiltre',
-      name: 'testFiltre',
-      component: TestFiltre
-    },
-    {
-      path: '/TestForm',
-      name: 'testForm',
-      component: TestForm,
-      props: true
-    },
-    // {
-    //   path: '/TestMap',
-    //   name: 'testMap',
-    //   component: TestMap,
-    //   props: true
-    // },
-    {
-      path: '/about',
-      name: 'about',
-      component: AboutView
-    },
-    {
-      path: '/about2',
-      name: 'about2',
-      component: AboutView2
-    },
-    {
-      path: '/mapview',
-      name: 'mapview',
-      component: MapView
-    },
-    {
       path: '/QuartieralpageView/:id',
       name: 'quartieralpageview',
       component: QuartieralpageView
-    },
-    {
-      path: '/alpageview/:id',
-      name: 'alpageview',
-      component: AlpageView
-    },
-    {
-      path: '/todoview',
-      name: 'todoview',
-      component: TodoView
-    },
-    {
-      path: '/AlpageList',
-      name: 'AlpageList',
-      component: AlpageList
     },
     {
       path: '/LogementList',
@@ -759,18 +624,42 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('user');  // Vérifie si l'utilisateur est connecté
+router.beforeEach(async (to, from, next) => {
+  const mainStore = useMainStore();
 
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!isAuthenticated) {
-      next('/');  // Redirige vers la page d'accueil si l'utilisateur n'est pas authentifié
-    } else {
-      next();  // Laisse passer l'utilisateur si authentifié
-    }
-  } else {
-    next();  // Si la route ne nécessite pas d'authentification, on continue
+  // 🔒 Vérifie d'abord l'authentification
+  const storedUser = localStorage.getItem('user')
+  if (to.meta.requiresAuth && !storedUser) {
+    //mainStore.setErrorMessage("Vous devez être connecté pour accéder à cette page.")
+    return next({ name: 'Login' })
   }
+
+  // 🛑 si route protégée avec permissions spécifiques
+  const requiredPermission = to.meta?.requiredPermission;
+  const modelName = to.meta?.modelName;
+  const liste = to.meta?.liste;
+
+  if (!mainStore.userPermissions || Object.keys(mainStore.userPermissions).length === 0) {
+    // console.log("⚠️ Permissions non chargées, récupération en cours...");
+    await mainStore.fetchUserPermissions();
+  }
+
+  if (requiredPermission && modelName) {
+    const hasPermission = mainStore.hasPermission(modelName, requiredPermission)
+    console.log("modelname:", modelName);
+    console.log("reqperm:", requiredPermission);
+
+    if (!hasPermission) {
+      // Afficher un message d’erreur sans déconnexion
+      mainStore.setErrorMessage("Vous n’avez pas les droits nécessaires pour accéder à cette page.")
+      console.log(modelName, requiredPermission);
+      // Rester sur la page précédente ou aller à une route "sûre"
+      console.log('liste', liste);
+      return next(false);
+    }
+  }
+
+  next();
 });
 
 

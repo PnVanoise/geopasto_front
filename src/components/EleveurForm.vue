@@ -1,4 +1,5 @@
 <template>
+  <p>Mode lecture seule : {{ isReadOnly }}</p>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
@@ -9,6 +10,7 @@
           id="nom"
           v-model="form.nom_eleveur"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -18,6 +20,7 @@
           type="text"
           id="nom"
           v-model="form.prenom_eleveur"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -27,6 +30,7 @@
           type="text"
           id="nom"
           v-model="form.tel_eleveur"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -36,6 +40,7 @@
           type="text"
           id="nom"
           v-model="form.mail_eleveur"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -45,6 +50,7 @@
           type="text"
           id="nom"
           v-model="form.adresse_eleveur"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -54,6 +60,7 @@
           type="text"
           id="nom"
           v-model="form.commentaire"
+          :disabled="props.isReadOnly"
         />
       </div>
       <!-- next id pour debug -->
@@ -63,7 +70,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!props.isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -76,6 +83,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false
+  },
   onSubmit: Function,
 });
 
@@ -113,7 +124,7 @@ onMounted(() => {
       .get(`${config.API_BASE_URL}/api/eleveur/getNextId/`)
       .then((response) => {
         nextId.value = response.data.next_id;
-        form.value.id_eleveur = nextId.value; // Optionnel: lier cet ID au formulaire si besoin
+        form.value.id_eleveur = nextId.value;
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération du Next ID", error);

@@ -21,15 +21,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="typeEqpts"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#d05d28'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="typeEqpts" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#d05d28'"
+            :columnLabels="columnLabels" @edit="onEdit" @delete="onDelete">
           </Grid>
         </div>
         <!-- <ul class="w3-ul w3-card-4 liste-d-items">
@@ -73,9 +66,8 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id", "nom", "description"]);
+const gridColumns = ref(["nom", "description"]);
 const columnLabels = ref({
-  id: "ID",
   nom: "Nom",
   description: "Description",
 });
@@ -208,8 +200,11 @@ onMounted(fetchTypeEqpts);
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
+
 /* Ajoutez vos styles ici */
 </style>

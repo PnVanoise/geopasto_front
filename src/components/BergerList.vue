@@ -3,34 +3,32 @@
     <img src="/spinner_2.gif" />
   </div>
   <div v-else class="main-container-one">
-    <div class="main-item">
-      <div class="w3-container">
-        <h2 class="w3-center">Liste des bergers</h2>
-      </div>
-      <div v-if="bergers">
-        <div class="header-actions">
-          <form id="search" class="search-form">
-            Rechercher <input name="query" v-model="searchQuery" />
-          </form>
-          <span class="w3-button add-up" @click="goToAddPage">
-            <font-awesome-icon icon="plus" /> Ajouter un berger
-          </span>
+    <div v-if="canView">
+      <div class="main-item">
+        <div class="w3-container">
+          <h2 class="w3-center">Liste des bergers</h2>
         </div>
-        <div class="grid-container">
-          <Grid
-            :data="bergers"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
-          </Grid>
+        <div v-if="bergers">
+          <div class="header-actions">
+            <form id="search" class="search-form">
+              Rechercher <input name="query" v-model="searchQuery" />
+            </form>
+            <span v-if="canAdd" class="w3-button add-up" @click="goToAddPage">
+              <font-awesome-icon icon="plus" /> Ajouter un berger
+            </span>
+          </div>
+          <div class="grid-container">
+            <Grid :data="bergers" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+              :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
+            </Grid>
+          </div>
         </div>
+        <div v-else>Aucune donnée disponible.</div>
       </div>
-      <div v-else>Aucune donnée disponible.</div>
     </div>
+    <p v-else>
+      Vous n'avez pas la permission de voir cette page.
+    </p>
   </div>
 </template>
 
@@ -50,12 +48,16 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_berger", "nom_berger", "prenom_berger"]);
+const gridColumns = ref(["nom_berger", "prenom_berger"]);
 const columnLabels = ref({
-  id_berger: "ID",
   nom_berger: "Nom",
   prenom_berger: "Prénom",
 });
+
+// droits
+console.log(mainStore);
+const canView = mainStore.hasPermission('berger', 'view');
+const canAdd = mainStore.hasPermission('berger', 'add');
 
 const fetchBergers = () => {
   auth.axiosInstance
@@ -84,6 +86,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_berger);
 
   router.push(`/Berger/edit/${entry.id_berger}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/Berger/edit/${entry.id_berger}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression

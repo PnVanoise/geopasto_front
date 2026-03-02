@@ -7,6 +7,7 @@
           class="w3-input w3-border"
           v-model="form.situation_exploitation"
           id="situation"
+          :disabled="props.isReadOnly"
         >
           <option
             v-for="situation in situations"
@@ -19,7 +20,12 @@
       </div>
       <div class="w3-half form-cell">
         <label for="berger">Berger:</label>
-        <select class="w3-input w3-border" v-model="form.berger" id="berger">
+        <select
+          class="w3-input w3-border"
+          v-model="form.berger"
+          id="berger"
+          :disabled="props.isReadOnly"
+        >
           <option
             v-for="berger in bergers"
             :key="berger.id_berger"
@@ -40,6 +46,7 @@
           v-model="form.date_debut"
           @keydown.prevent
           @paste.prevent
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -51,6 +58,7 @@
           v-model="form.date_fin"
           @keydown.prevent
           @paste.prevent
+          :disabled="props.isReadOnly"
         />
       </div>
     </div>
@@ -62,6 +70,7 @@
           type="text"
           id="commentaire"
           v-model="form.commentaire"
+          :disabled="props.isReadOnly"
         />
       </div>
     </div>
@@ -72,7 +81,7 @@
         {{ nextId }}
         )
       </div>
-      <button type="submit">Enregistrer</button>
+      <button v-if="!isReadOnly" type="submit">Enregistrer</button>
     </div>
   </form>
 </template>
@@ -86,6 +95,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 

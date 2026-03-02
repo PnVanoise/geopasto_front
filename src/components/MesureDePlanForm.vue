@@ -9,6 +9,7 @@
         id="description"
         v-model="form.description"
         required
+        :disabled="props.isReadOnly"
       />
     </div>
     <div class="w3-half form-cell">
@@ -19,6 +20,7 @@
         id="commentaire"
         v-model="form.commentaire"
         required
+        :disabled="props.isReadOnly"
       />
     </div>
     <div class="w3-half form-cell">
@@ -31,6 +33,7 @@
         @keydown.prevent
         @paste.prevent
         required
+        :disabled="props.isReadOnly"
       />
     </div>
     <div class="w3-half form-cell">
@@ -43,11 +46,17 @@
         @keydown.prevent
         @paste.prevent
         required
+        :disabled="props.isReadOnly"
       />
     </div>
     <div class="w3-half form-cell">
       <label for="typedemesure">Type de mesure:</label>
-      <select class="w3-input w3-border" v-model="form.type_mesure" id="typedemesure">
+      <select
+        class="w3-input w3-border"
+        v-model="form.type_mesure"
+        id="typedemesure"
+        :disabled="props.isReadOnly"
+      >
         <option
           v-for="typemesure in typemesures"
           :key="typemesure.id_type_mesure"
@@ -59,7 +68,12 @@
     </div>
     <div class="w3-half form-cell">
       <label for="plandesuivi">Plan de suivi:</label>
-      <select class="w3-input w3-border" v-model="form.plan_suivi" id="plandesuivi">
+      <select
+        class="w3-input w3-border"
+        v-model="form.plan_suivi"
+        id="plandesuivi"
+        :disabled="props.isReadOnly"
+      >
         <option
           v-for="plansuivi in plansuivis"
           :key="plansuivi.id_plan_suivi"
@@ -77,7 +91,7 @@
       )
     </div>
     <!-- </div> -->
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -90,6 +104,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 

@@ -29,3 +29,10 @@ PM2 a été installé avec les dépendances du projet. C'est un gestionnaire de 
 ```
 pm2 start "npm run dev -- --host=0.0.0.0 --port=9877" --name "geopasto_front"
 ```
+
+- Listes / formulaires (4 fichiers)
+- Différence json / geojson
+- NextID
+- Geometrie vide
+- Grilles imbriquées
+- Formulaires paramétrés 

@@ -9,6 +9,7 @@
           id="description"
           v-model="form.description"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <!-- next id pour debug -->
@@ -18,7 +19,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly "type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -31,6 +32,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 

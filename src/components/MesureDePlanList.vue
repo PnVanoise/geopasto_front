@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="mesuredeplans"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="mesuredeplansWithDesc" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -35,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
@@ -50,10 +43,22 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_mesure_plan", "description"]);
+const gridColumns = ref(["description", "description_type", "nom_up", "debut_periode", "fin_periode"]);
 const columnLabels = ref({
-  id_mesure_plan: "ID",
-  description: "Desc.",
+  description: "Description",
+  description_type: "Type de mesure",
+  nom_up: "UP",
+  debut_periode: "Début",
+  fin_periode: "Fin"
+});
+
+const mesuredeplansWithDesc = computed(() => {
+  return mesuredeplans.value.map(exp => ({
+    ...exp,
+    description_type: exp.type_mesure_detail?.description || "",
+    nom_up: exp.plan_suivi_detail?.unite_pastorale_detail?.nom_up || "",
+  }));
+
 });
 
 const fetchMesurePlans = () => {
@@ -82,6 +87,14 @@ const goToAddPage = () => {
 function onEdit(entry) {
   console.log("Éditer:", entry.id_mesure_plan);
   router.push(`/MesurePlan/edit/${entry.id_mesure_plan}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/MesurePlan/edit/${entry.id_mesure_plan}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression
@@ -170,8 +183,11 @@ onMounted(fetchMesurePlans);
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
+
 /* Ajoutez vos styles ici */
 </style>

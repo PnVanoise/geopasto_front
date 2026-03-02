@@ -19,6 +19,7 @@ const form = ref({
   properties: {
     code_up: "",
     nom_up: "",
+    secteur: "",
     annee_version: "",
     version_active: false,
   },

@@ -39,6 +39,24 @@
           </select>
         </div>
 
+        <div class="w3-row form_cell">
+          <label for="type_convention">Type de convention :</label>
+          <select
+            class="w3-input w3-border"
+            v-model.number="form.properties.type_convention"
+            id="type_convention"
+          >
+          <option :value="null">-- Choisir un type de convention --</option>
+          <option
+            v-for="typeC in typeCs"
+            :key="typeC.id_type_convention"
+            :value="Number(typeC.id_type_convention)"
+          >
+            {{ typeC.description }}
+          </option>
+        </select>
+        </div>
+
         <div class="w3-half form-cell">
           <label for="dateDebut">Date de début:</label>
           <input
@@ -182,14 +200,40 @@ const props = defineProps({
 
 const exploitants = ref([]);
 const ups = ref([]);
+const typeCs = ref([]);
 
-const form = ref({ ...props.initialForm });
+const form = ref({
+  id: null,
+  properties: {
+    surface_location: "",
+    surface_exploitable: "",
+    date_debut: "",
+    date_fin: "",
+    effectif_bovin: "",
+    effectif_ovin: "",
+    effectif_caprin: "",
+    effectif_porcin: "",
+    debut_periode_expl: "",
+    fin_periode_expl: "",
+    up_nom: "",
+    exploitant_nom: "",
+  },
+  geometry: {
+    type: "Polygon",
+    coordinates: [],
+  },
+});
 
 // Variable pour stocker le nextId
 const nextId = ref(null);
 
 const submitForm = () => {
   console.log("Form submitted with:", form.value);
+
+  if (!props.isEdit) {
+    form.value.id = nextId.value;
+  }
+
   props
     .onSubmit(form.value)
     .then(() => {
@@ -209,45 +253,34 @@ watch(
 );
 
 // Hooks de cycle de vie pour déboguer
-onMounted(() => {
+onMounted(async () => {
   console.log("ConventionForm component mounted");
 
-  if (!props.isEdit) {
-    auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/conventionExploitation/getNextId/`)
-      .then((response) => {
-        nextId.value = response.data.next_id;
-        form.value.id = nextId.value; // Optionnel: lier cet ID au formulaire si besoin
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la récupération du Next ID", error);
-      });
+  // hargement des tables liées
+  try {
+    const [typeRes, exploitantRes, upRes] = await Promise.all([
+      auth.axiosInstance.get(`${config.API_BASE_URL}/api/typeConvention/`),
+      auth.axiosInstance.get(`${config.API_BASE_URL}/api/exploitant/`),
+      auth.axiosInstance.get(`${config.API_BASE_URL}/api/unitePastorale/`)
+    ]);
+    typeCs.value = typeRes.data;
+    exploitants.value = exploitantRes.data;
+    ups.value = upRes.data;
+
+  } catch (err) {
+    console.error("Erreur chargement convention form", err);
   }
 
-  // Récupère les exploitants
-  auth.axiosInstance
-    .get(`${config.API_BASE_URL}/api/exploitant/`)
-    .then((response) => {
-      exploitants.value = response.data;
-      console.log("exploitants:", exploitants.value);
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la récupération de la liste des exploitants", error);
-    });
 
-  // Récupère les unités pastorales
-  auth.axiosInstance
-    .get(`${config.API_BASE_URL}/api/unitePastorale/`)
-    .then((response) => {
-      ups.value = response.data;
-      console.log("ups:", ups.value);
-    })
-    .catch((error) => {
-      console.error(
-        "Erreur lors de la récupération de la liste des unités pastorales",
-        error
-      );
-    });
+  if (!props.isEdit) {
+    try {
+      const nextRes = await auth.axiosInstance.get(`${config.API_BASE_URL}/api/conventionExploitation/getNextId/`);
+      nextId.value = nextRes.data.next_id;
+      form.value.id = nextId.value;
+    } catch (err) {
+      console.error("Erreur récupération Next ID", err);
+    }
+  }
 });
 
 onBeforeUnmount(() => {

@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="planSuivis"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="planSuivisWithDesc" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -35,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
@@ -50,10 +43,20 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_plan_suivi", "description"]);
+const gridColumns = ref(["description", "nom_up", "date_debut", "date_fin"]);
 const columnLabels = ref({
-  id_plan_suivi: "ID",
+  nom_up: "UP",
   description: "Description",
+  date_debut: "Début",
+  date_fin: "Fin",
+});
+
+const planSuivisWithDesc = computed(() => {
+  return planSuivis.value.map(exp => ({
+    ...exp,
+    nom_up: exp.unite_pastorale_detail?.nom_up || "",
+  }));
+
 });
 
 const fetchPlanSuivis = () => {
@@ -82,6 +85,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_plan_suivi);
 
   router.push(`/PlanSuivi/edit/${entry.id_plan_suivi}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/PlanSuivi/edit/${entry.id_plan_suivi}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression
@@ -174,8 +185,11 @@ onMounted(fetchPlanSuivis);
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
+
 /* Ajoutez vos styles ici */
 </style>

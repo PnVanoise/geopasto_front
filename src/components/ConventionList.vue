@@ -18,7 +18,7 @@
         </div>
         <div class="grid-container">
           <Grid
-            :data="features"
+            :data="conventionsSorted"
             :columns="gridColumns"
             :filter-key="searchQuery"
             :bgColor="'#f7ba0b'"
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
@@ -52,11 +52,36 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id", "exploitant_nom", "up_nom"]);
+
+const conventionsWithTypeDesc = computed(() => {
+  return features.value.map(exp => ({
+    ...exp,
+    type_description: exp.type_convention_detail?.description || "",
+  }));
+});
+
+const conventionsSorted = computed(() => {
+  return [...conventionsWithTypeDesc.value].sort((a, b) => {
+    const upA = a.up_nom?.toLowerCase() || "";
+    const upB = b.up_nom?.toLowerCase() || "";
+    const expA = a.exploitant_nom.toLowerCase();
+    const expB = b.exploitant_nom.toLowerCase();
+
+    if (expA < expB) return -1;
+    if (expA > expB) return 1;
+
+    // Si type égaux, trie sur le nom
+    if (upA < upB) return -1;
+    if (upA > upB) return 1;
+    return 0; // égaux
+  });
+});
+
+const gridColumns = ref(["exploitant_nom", "up_nom", "type_description"]);
 const columnLabels = ref({
-  id: "ID",
   exploitant_nom: "Exploitant",
   up_nom: "UP",
+  type_description: "Type de convention",
 });
 
 const fetchConventions = () => {

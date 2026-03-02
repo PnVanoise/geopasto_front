@@ -16,6 +16,7 @@ import { useMainStore } from "../store";
 
 const form = ref({
   properties: {
+    unite_pastorale,
     logement_code: "",
     statut: "",
     acces_final: "",

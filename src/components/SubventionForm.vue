@@ -1,4 +1,5 @@
 <template>
+  <p>Mode lecture seule : {{ isReadOnly }}</p>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
@@ -9,23 +10,45 @@
           id="description"
           v-model="form.description"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
         <label for="montant">Montant:</label>
-        <input class="w3-input w3-border" type="text" id="nom" v-model="form.montant" />
+        <input
+          class="w3-input w3-border"
+          type="text"
+          id="nom"
+          v-model="form.montant"
+          :disabled="props.isReadOnly"
+        />
       </div>
       <div class="w3-half form-cell">
         <label for="engage">Engagé:</label>
-        <input type="checkbox" id="active" v-model="form.engage" />
+        <input
+          type="checkbox"
+          id="active"
+          v-model="form.engage"
+          :disabled="props.isReadOnly"
+        />
       </div>
       <div class="w3-half form-cell">
         <label for="paye">Payé:</label>
-        <input type="checkbox" id="active" v-model="form.paye" />
+        <input
+          type="checkbox"
+          id="active"
+          v-model="form.paye"
+          :disabled="props.isReadOnly"
+        />
       </div>
       <div class="w3-half form-cell">
         <label for="exploitant">Exploitant:</label>
-        <select class="w3-input w3-border" id="exploitant" v-model="form.exploitant">
+        <select
+          class="w3-input w3-border"
+          id="exploitant"
+          v-model="form.exploitant"
+          :disabled="props.isReadOnly"
+        >
           <option
             v-for="exploitant in exploitants"
             :key="exploitant.id_exploitant"
@@ -43,7 +66,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -56,6 +79,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 
@@ -88,7 +115,7 @@ watch(
 
 // Hooks de cycle de vie pour déboguer
 onMounted(() => {
-  console.log("EleveurForm component mounted");
+  console.log("SubventionForm component mounted");
 
   if (!props.isEdit) {
     auth.axiosInstance

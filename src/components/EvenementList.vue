@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="features"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#9b2423'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="features" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#9b2423'"
+            :columnLabels="columnLabels" @edit="onEdit" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -35,18 +28,9 @@
       <h2>Où les trouve-t-on ?</h2>
       <MapContainer v-model="mapRef">
         <BaseLayersControl :map="mapRef" />
-        <GeoJsonLayer
-          :map="mapRef"
-          :geoData="evenements"
-          geoObjectName="evenement"
-          :style="layerStyle"
-          popupRoute="/evenement/edit"
-          popupAttribute="description"
-          geomType="Point"
-          iconFile="marqueur_bleu.png"
-          iconHighlightFile="marqueur_rouge.png"
-          objectLib="Evenement"
-        />
+        <GeoJsonLayer :map="mapRef" :geoData="evenements" geoObjectName="evenement" :style="layerStyle"
+          popupRoute="/evenement/edit" popupAttribute="description" geomType="Point" iconFile="marqueur_bleu.png"
+          iconHighlightFile="marqueur_rouge.png" objectLib="Evenement" />
         <!-- <LegendControl :map="mapRef" :legendHtml="legendContent" /> -->
       </MapContainer>
       <!-- <MapList
@@ -82,9 +66,8 @@ const mapRef = ref(null);
 const router = useRouter();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_evenement", "date_evenement", "observateur", "date_observation", "source", "description"]);
+const gridColumns = ref(["date_evenement", "observateur", "date_observation", "source", "description"]);
 const columnLabels = ref({
-  id_evenement: "Id",
   description: "Description",
   date_evenement: "Date évènement",
   observateur: "Observateur",

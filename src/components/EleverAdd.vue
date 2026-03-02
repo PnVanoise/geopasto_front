@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>Ajouter un troupeau - éleveur</h1>
-    <EleverForm :initialForm="form" :isEdit="false" :onSubmit="submitForm" />
+    <h1>Ajouter un cheptel</h1>
+    <EleverForm :initialForm="form" :isEdit="false" :explId="explId" :onSubmit="submitForm" />
   </div>
 </template>
 
@@ -16,11 +16,14 @@ import { useMainStore } from "../store";
 import EleverForm from "./EleverForm.vue";
 
 const route = useRoute();
+const situId = route.params.situId || "";
+const explId = route.params.explId || "";
+
 console.log("route", route.params);
 
 const form = ref({
   eleveur: "",
-  situation_exploitation: route.params.situId || "",
+  situation_exploitation: situId,
   type_cheptel: "",
   nombre_animaux: "",
   date_debut: "",
@@ -31,15 +34,22 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const submitForm = async (formData) => {
+  
+    const payload = {
+      ...formData,
+      date_debut: formData.date_debut || null,
+      date_fin: formData.date_fin || null,
+    };
+
   try {
     const response = await auth.axiosInstance.post(
       `${config.API_BASE_URL}/api/elever/`,
-      formData
+      payload
     );
     console.log("Form successfully submitted, response:", response);
 
     // Afficher un message de succès
-    mainStore.setSuccessMessage("Troupeau - Eleveur ajouté avec succès!");
+    mainStore.setSuccessMessage("Cheptel ajouté avec succès!");
 
     // Vérifier si le message est bien défini dans le store
     console.log("Success message set:", mainStore.successMessage);
@@ -50,7 +60,7 @@ const submitForm = async (formData) => {
     }, 500); // Petit délai pour s'assurer que le message est vu
   } catch (error) {
     mainStore.setErrorMessage(
-      "Une erreur s'est produite lors de l'ajout du Troupeau - Eleveur." + error
+      "Une erreur s'est produite lors de l'ajout du cheptel." + error
     );
     console.error("There was an error!", error);
   }

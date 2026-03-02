@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="abris"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="abris" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#005187'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -50,9 +43,8 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_abri_urgence", "description", "etat"]);
+const gridColumns = ref(["description", "etat"]);
 const columnLabels = ref({
-  id_abri_urgence: "ID",
   description: "Description",
   etat: "Etat",
 });
@@ -84,6 +76,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_abri_urgence);
 
   router.push(`/AbriUrgence/edit/${entry.id_abri_urgence}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/AbriUrgence/edit/${entry.id_abri_urgence}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression

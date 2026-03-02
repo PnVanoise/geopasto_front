@@ -17,8 +17,16 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid :data="eleveurs" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels" @edit="onEdit" @delete="onDelete">
+          <Grid
+            :data="eleveurs"
+            :columns="gridColumns"
+            :filter-key="searchQuery"
+            :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels"
+            @edit="onEdit"
+            @delete="onDelete"
+            @view="onView"
+          >
           </Grid>
         </div>
       </div>
@@ -43,9 +51,9 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_eleveur", "nom_eleveur", "prenom_eleveur"]);
+
+const gridColumns = ref(["nom_eleveur", "prenom_eleveur"]);
 const columnLabels = ref({
-  id_eleveur: "ID",
   nom_eleveur: "Nom",
   prenom_eleveur: "Prénom",
 });
@@ -75,8 +83,16 @@ const goToAddPage = () => {
 // Méthode pour gérer l'édition
 function onEdit(entry) {
   console.log("Éditer:", entry.id_eleveur);
-
   router.push(`/Eleveur/edit/${entry.id_eleveur}`);
+}
+
+// Méthode pour gérer l'affichage
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/Eleveur/edit/${entry.id_eleveur}`,
+    query: { readonly: 'true'}
+  });
 }
 
 // Méthode pour gérer la suppression

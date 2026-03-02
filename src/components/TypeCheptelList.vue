@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="typeCs"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="typeCs" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -50,10 +43,9 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_type_cheptel", "description"]);
+const gridColumns = ref(["description"]);
 const columnLabels = ref({
-  id_type_cheptel: "ID",
-  description: "Desc.",
+  description: "Description",
 });
 
 const fetchTypes = () => {
@@ -81,8 +73,15 @@ const goToAddPage = () => {
 // Méthode pour gérer l'édition
 function onEdit(entry) {
   console.log("Éditer:", entry.id_type_cheptel);
-
   router.push(`/TypeCheptel/edit/${entry.id_type_cheptel}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/TypeCheptel/edit/${entry.id_type_cheptel}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression

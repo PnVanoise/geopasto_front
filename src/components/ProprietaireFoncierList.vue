@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="proprios"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="proprios" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @delete="onDelete" @view="onView">
           </Grid>
         </div>
       </div>
@@ -50,9 +43,8 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_proprietaire", "nom_propr", "prenom_propr"]);
+const gridColumns = ref(["nom_propr", "prenom_propr"]);
 const columnLabels = ref({
-  id_proprietaire: "ID",
   nom_propr: "Nom",
   prenom_propr: "Prénom",
 });
@@ -91,9 +83,13 @@ function onDelete(entry) {
   deleteProprietaire(entry.id_proprietaire);
 }
 
-// const editTypeEqpt = (id) => {
-//   router.push(`/TypeEquipementAlpage/edit/${id}`);
-// };
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/ProprietaireFoncier/edit/${entry.id_proprietaire}`,
+    query: { readonly: 'true' }
+  });
+}
 
 const deleteProprietaire = (id) => {
   auth.axiosInstance
@@ -175,8 +171,11 @@ onMounted(fetchProprietaires);
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
+
 /* Ajoutez vos styles ici */
 </style>

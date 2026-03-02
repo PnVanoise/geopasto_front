@@ -24,6 +24,7 @@
             :bgColor="'#f7ba0b'"
             :columnLabels="columnLabels"
             @edit="onEdit"
+            @view="onView"
             @delete="onDelete"
           >
           </Grid>
@@ -93,6 +94,14 @@ const goToAddPage = () => {
 function onEdit(entry) {
   console.log("Éditer:", entry);
   router.push(`/GardeTroupeau/edit/${entry.id_garde_situation}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/GardeTroupeau/edit/${entry.id_garde_situation}`,
+    query: { readonly: 'true'}
+  });
 }
 
 // Méthode pour gérer la suppression

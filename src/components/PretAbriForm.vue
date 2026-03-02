@@ -1,4 +1,5 @@
 <template>
+  <p>Mode lecture seule : {{ isReadOnly }}</p>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
@@ -7,6 +8,7 @@
           class="w3-input w3-border"
           v-model="form.properties.exploitant"
           id="exploitant"
+          :disabled="props.isReadOnly"
         >
           <option
             v-for="exploitant in exploitants"
@@ -23,6 +25,7 @@
           class="w3-input w3-border"
           v-model="form.properties.abri_urgence"
           id="abri"
+          :disabled="props.isReadOnly"
         >
           <option
             v-for="abri in abris"
@@ -42,6 +45,7 @@
           v-model="form.properties.date_debut"
           @keydown.prevent
           @paste.prevent
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -53,6 +57,7 @@
           v-model="form.properties.date_fin"
           @keydown.prevent
           @paste.prevent
+          :disabled="props.isReadOnly"
         />
       </div>
       <!-- next id pour debug -->
@@ -70,7 +75,7 @@
         :geometryType="'Point'"
       />
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!props.isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -85,6 +90,10 @@ import MapEditMultipolygon2 from "./MapEditMultipolygon2.vue";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false
+  },
   onSubmit: Function,
 });
 
@@ -98,11 +107,9 @@ const nextId = ref(null);
 
 const submitForm = () => {
   console.log("Form submitted with:", form.value);
-
   if (!props.isEdit) {
     form.value.id = nextId.value;
   }
-
   props
     .onSubmit(form.value)
     .then(() => {
@@ -130,7 +137,7 @@ onMounted(() => {
       .get(`${config.API_BASE_URL}/api/beneficierDe/getNextId/`)
       .then((response) => {
         nextId.value = response.data.next_id;
-        form.value.id = nextId.value; // Optionnel: lier cet ID au formulaire si besoin
+        form.value.id = nextId.value;
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération du Next ID", error);

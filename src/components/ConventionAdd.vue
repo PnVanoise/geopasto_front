@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Ajouter un type de convention</h1>
+    <h1>Ajouter une convention d'exploitation</h1>
     <ConventionForm :initialForm="form" :isEdit="false" :onSubmit="submitForm" />
   </div>
 </template>
@@ -17,8 +17,24 @@ import { useMainStore } from "../store";
 import ConventionForm from "./ConventionForm.vue";
 
 const form = ref({
-  surface_location: "",
-  date_debut: "",
+  properties: {
+    surface_location: "",
+    surface_exploitable: "",
+    date_debut: "",
+    date_fin: "",
+    effectif_bovin: "",
+    effectif_ovin: "",
+    effectif_caprin: "",
+    effectif_porcin: "",
+    debut_periode_expl: "",
+    fin_periode_expl: "",
+    up_nom: "",
+    exploitant_nom: "",
+  },
+  geometry: {
+    type: "Polygon",
+    coordinates: [],
+  },
 });
 
 const router = useRouter();

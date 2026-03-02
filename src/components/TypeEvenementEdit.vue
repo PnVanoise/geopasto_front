@@ -1,12 +1,16 @@
 <template>
   <div>
-    <h1>Éditer un type d'événement'</h1>
-    <TypeEvenementForm :initialForm="form" :isEdit="true" :onSubmit="submitForm" />
+    <h1>{{ title }}</h1>
+    <TypeEvenementForm
+      :initialForm="form"
+      :isEdit="true"
+      :is-read-only="isReadOnly"
+      :onSubmit="isReadOnly ? submitForm : undefined" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 import auth from "../../auth";
@@ -22,6 +26,11 @@ const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
 const mainStore = useMainStore();
+
+const isReadOnly = computed(() => route.query.readonly === 'true');
+const title = computed(() =>
+  isReadOnly.value ? "Consulter un type d'événement" : "Éditer un type d'événement"
+);
 
 const fetchTypeEvt = () => {
   auth.axiosInstance

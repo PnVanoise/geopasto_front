@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="typeConventions"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="typeConventions" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @delete="onDelete" @view="onView">
           </Grid>
         </div>
       </div>
@@ -50,10 +43,9 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_type_convention", "description"]);
+const gridColumns = ref(["description"]);
 const columnLabels = ref({
-  id_type_convention: "ID",
-  description: "Desc.",
+  description: "Description",
 });
 
 const fetchTypeConventions = () => {
@@ -83,6 +75,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_type_convention);
 
   router.push(`/TypeConvention/edit/${entry.id_type_convention}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/TypeConvention/edit/${entry.id_type_convention}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression
@@ -175,8 +175,11 @@ onMounted(fetchTypeConventions);
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
+
 /* Ajoutez vos styles ici */
 </style>

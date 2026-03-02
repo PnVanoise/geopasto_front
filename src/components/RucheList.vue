@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="features"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#9b2423'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="features" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#9b2423'"
+            :columnLabels="columnLabels" @edit="onEdit" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -35,17 +28,8 @@
       <h2>Où les trouve-t-on ?</h2>
       <MapContainer v-model="mapRef">
         <BaseLayersControl :map="mapRef" />
-        <GeoJsonLayer
-          :map="mapRef"
-          :geoData="ruches"
-          geoObjectName="ruche"
-          :style="layerStyle"
-          popupRoute="/Ruche/edit"
-          geomType="Point"
-          iconFile="marqueur_bleu.png"
-          iconHighlightFile="marqueur_rouge.png"
-          objectLib="Ruche"
-        />
+        <GeoJsonLayer :map="mapRef" :geoData="ruches" geoObjectName="ruche" :style="layerStyle" popupRoute="/Ruche/edit"
+          geomType="Point" iconFile="marqueur_bleu.png" iconHighlightFile="marqueur_rouge.png" objectLib="Ruche" />
       </MapContainer>
     </div>
   </div>
@@ -71,9 +55,8 @@ const mapRef = ref(null);
 const router = useRouter();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id", "description"]);
+const gridColumns = ref(["description"]);
 const columnLabels = ref({
-  id: "ID",
   description: "Description",
 });
 const features = ref([]);

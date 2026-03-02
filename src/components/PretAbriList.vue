@@ -25,6 +25,7 @@
             :columnLabels="columnLabels"
             @edit="onEdit"
             @delete="onDelete"
+            @view="onView"
           >
           </Grid>
         </div>
@@ -32,13 +33,6 @@
       <div v-else>Aucune donnée disponible.</div>
     </div>
     <div class="main-item">
-      <!-- <MapList
-        geoObjectName="unitePastorale"
-        :style="quartierUPStyle"
-        popupRoute="/UnitePastorale"
-        :legendInnerHtml="legendHtml"
-      /> -->
-
       <h2>Où les trouve-t-on ?</h2>
       <MapContainer v-model="mapRef">
         <BaseLayersControl :map="mapRef" />
@@ -53,9 +47,9 @@
           iconFile="marqueur_bleu.png"
           iconHighlightFile="marqueur_rouge.png"
           objectLib="Abri d'urgence"
+          popupAttribute="exploitant.nom_exploitant"
         />
       </MapContainer>
-      <!-- <LegendControl :map="mapRef" :legendHtml="legendContent" /> -->
     </div>
   </div>
 </template>
@@ -126,6 +120,15 @@ function onEdit(entry) {
   router.push(`/PretAbri/edit/${entry.id}`);
 }
 
+// Méthode pour gérer l'affichage
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/PretAbri/edit/${entry.id}`,
+    query: { readonly: 'true'}
+  });
+}
+
 // Méthode pour gérer la suppression
 function onDelete(entry) {
   console.log("Supprimer:", entry.id);
@@ -145,6 +148,34 @@ const deletePret = (id) => {
 };
 
 onMounted(fetchPrets);
+
+import L from "leaflet";
+
+const addZoomDisplayControl = (map) => {
+  const zoomLabel = L.control({ position: "topleft" });
+
+  zoomLabel.onAdd = function () {
+    const div = L.DomUtil.create("div", "leaflet-zoom-label");
+    div.innerHTML = `Zoom : ${map.getZoom()}`;
+
+    map.on("zoomend", () => {
+      div.innerHTML = `Zoom : ${map.getZoom()}`;
+    });
+
+    return div;
+  };
+
+  zoomLabel.addTo(map);
+};
+
+import { watch } from "vue";
+
+watch(mapRef, (map) => {
+  if (map) {
+    addZoomDisplayControl(map);
+  }
+});
+
 </script>
 
 <style scoped>
@@ -218,5 +249,13 @@ onMounted(fetchPrets);
   /* Assure que le contenu s'adapte à l'arrondi */
 }
 
+.leaflet-zoom-label {
+  background-color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
 /* Ajoutez vos styles ici */
 </style>

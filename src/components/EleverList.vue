@@ -5,27 +5,24 @@
   <div v-else class="main-container-one">
     <div class="main-item">
       <div class="w3-container">
-        <h2 class="w3-center">Liste des troupeaux - éleveurs</h2>
+        <h2 class="w3-center">Liste des cheptels</h2>
       </div>
       <div v-if="elevers">
         <div class="header-actions">
           <form id="search" class="search-form">
             Rechercher <input name="query" v-model="searchQuery" />
           </form>
+          <div class="year-filter">
+            <input type="checkbox" id="thisYear" v-model="filterThisYear" />
+            <label for="thisYear">Année en cours</label>
+          </div>
           <span class="w3-button add-up" @click="goToAddPage">
-            <font-awesome-icon icon="plus" /> Ajouter un troupeau - éleveur
+            <font-awesome-icon icon="plus" /> Ajouter un cheptel
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="features"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="eleversWithTypeDesc" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -35,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
@@ -54,18 +51,53 @@ const mainStore = useMainStore();
 
 const searchQuery = ref("");
 const gridColumns = ref([
-  "situation_nom",
-  "eleveur_prenom",
-  "eleveur_nom",
-  "type_cheptel_description",
+  "nom_complet_eleveur",
+  "nom_up",
+  "annee",
+  "type_description",
   "nombre_animaux",
 ]);
 const columnLabels = ref({
-  situation_nom: "Situation",
-  eleveur_prenom: "Prénom Eleveur",
-  eleveur_nom: "Nom Eleveur",
-  type_cheptel_description: "Type de cheptel",
+  nom_complet_eleveur: "Eleveur",
+  nom_up: "UP",
+  annee: "Année",
+  type_description: "Type de cheptel",
   nombre_animaux: "Nombre d'animaux",
+});
+const filterThisYear = ref(false);
+
+const eleversWithTypeDesc = computed(() => {
+  const currentYear = new Date().getFullYear();
+
+  let list = features.value;
+
+  // Filtre année en cours
+  if (filterThisYear.value) {
+    list = list.filter(exp => {
+      if (!exp.date_debut) return false;
+      const year = new Date(exp.date_debut).getFullYear();
+      return year === currentYear;
+    });
+  }
+
+  return list.map(exp => {
+    const tmpNom = exp.eleveur_detail?.nom_eleveur || "";
+    const tmpPre = exp.eleveur_detail?.prenom_eleveur || "";
+    let eleFullName = tmpNom && tmpPre ? tmpNom + " " + tmpPre : (tmpNom || tmpPre || "Information non disponible");
+
+    const tmpNomUP = exp.situation_detail?.unite_pastorale_detail?.nom_up || "";
+    const tmpAnnee = !exp.date_debut ? "" :
+      isNaN(new Date(exp.date_debut)) ? "" :
+        new Date(exp.date_debut).getFullYear();
+
+    return {
+      ...exp,
+      nom_up: tmpNomUP,
+      annee: tmpAnnee,
+      type_description: exp.type_cheptel_detail?.description || "",
+      nom_complet_eleveur: eleFullName,
+    };
+  });
 });
 
 const fetchElevers = () => {
@@ -102,6 +134,15 @@ function onEdit(entry) {
   router.push(`/Elever/edit/${entry.id_elever}`);
 }
 
+function onView(entry) {
+  console.log("View:", entry);
+  console.log("Navigating to readonly view for", entry.id_elever);
+  router.push({
+    path: `/Elever/edit/${entry.id_elever}`,
+    query: { readonly: 'true' }
+  });
+}
+
 // Méthode pour gérer la suppression
 function onDelete(entry) {
   console.log("Supprimer:", entry.id_elever);
@@ -124,6 +165,13 @@ onMounted(fetchElevers);
 </script>
 
 <style scoped>
+.year-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 20px;
+}
+
 .title-container {
   display: flex;
   align-items: center;

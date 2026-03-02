@@ -4,28 +4,16 @@
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
         <label for="situation">Situation:</label>
-        <select
-          class="w3-input w3-border"
-          v-model="form.situation_exploitation"
-          id="situation"
-        >
-          <option
-            v-for="situation in situations"
-            :key="situation.id_situation"
-            :value="situation.id_situation"
-          >
+        <select class="w3-input w3-border" v-model="form.situation_exploitation" id="situation" :disabled="isReadOnly">
+          <option v-for="situation in situations" :key="situation.id_situation" :value="situation.id_situation">
             {{ situation.nom_situation }}
           </option>
         </select>
       </div>
       <div class="w3-half form-cell">
         <label for="eleveur">Eleveur:</label>
-        <select class="w3-input w3-border" v-model="form.eleveur" id="berger">
-          <option
-            v-for="eleveur in eleveurs"
-            :key="eleveur.id_eleveur"
-            :value="eleveur.id_eleveur"
-          >
+        <select class="w3-input w3-border" v-model="form.eleveur" id="eleveur" :disabled="isReadOnly">
+          <option v-for="eleveur in eleveurs" :key="eleveur.id_eleveur" :value="eleveur.id_eleveur">
             {{ eleveur.prenom_eleveur }} {{ eleveur.nom_eleveur }}
           </option>
         </select>
@@ -35,44 +23,28 @@
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
         <label for="typeCheptel">Type de cheptel:</label>
-        <select class="w3-input w3-border" v-model="form.type_cheptel" id="type_cheptel">
-          <option
-            v-for="typeC in typeCs"
-            :key="typeC.id_type_cheptel"
-            :value="typeC.id_type_cheptel"
-          >
+        <select class="w3-input w3-border" v-model="form.type_cheptel" id="type_cheptel" :disabled="isReadOnly">
+          <option v-for="typeC in typeCs" :key="typeC.id_type_cheptel" :value="typeC.id_type_cheptel">
             {{ typeC.description }}
           </option>
         </select>
       </div>
       <div class="w3-half form-cell">
         <label for="eleveur">Nombre d'animaux:</label>
-        <input class="w3-input w3-border" type="number" id="nombre"
-        v-model="form.nombre_animaux"
+        <input class="w3-input w3-border" type="number" min="1" id="nombre" v-model="form.nombre_animaux"
+          :disabled="isReadOnly" />
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
         <label for="dateDebut">Date de début:</label>
-        <input
-          class="w3-input w3-border"
-          type="date"
-          id="dateDebut"
-          v-model="form.date_debut"
-          @keydown.prevent
-          @paste.prevent
-        />
+        <input class="w3-input w3-border" type="date" id="dateDebut" v-model="form.date_debut" @keydown.prevent
+          @paste.prevent :disabled="isReadOnly" />
       </div>
       <div class="w3-half form-cell">
         <label for="dateFin">Date de fin:</label>
-        <input
-          class="w3-input w3-border"
-          type="date"
-          id="dateFin"
-          v-model="form.date_fin"
-          @keydown.prevent
-          @paste.prevent
-        />
+        <input class="w3-input w3-border" type="date" id="dateFin" v-model="form.date_fin" @keydown.prevent
+          @paste.prevent :disabled="props.isReadOnly" />
       </div>
     </div>
     <div class="w3-row form-ligne">
@@ -82,7 +54,7 @@
         {{ nextId }}
         )
       </div>
-      <button type="submit">Enregistrer</button>
+      <button v-if="!isReadOnly" type="submit">Enregistrer</button>
     </div>
   </form>
 </template>
@@ -96,6 +68,14 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
+  explId: {
+    type: [String, Number, null],
+    default: null 
+  },
   onSubmit: Function,
 });
 
@@ -161,10 +141,22 @@ onMounted(() => {
         "Erreur lors de la récupération de la liste des situations d'exploitation.",
         error
       );
-    });
+  });
 
-  // Récupère les bergers
-  auth.axiosInstance
+  console.log("props : ", props);
+  // Récupère les éleveurs
+  if(props.explId) {
+    auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/eleveur/by-exploitant/${props.explId}/`)
+    .then((response) => {
+      eleveurs.value = response.data;
+      console.log("eleveur:", eleveurs.value);
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération de la liste des éleveurs.", error);
+    });
+  } else {
+    auth.axiosInstance
     .get(`${config.API_BASE_URL}/api/eleveur/`)
     .then((response) => {
       eleveurs.value = response.data;
@@ -173,6 +165,8 @@ onMounted(() => {
     .catch((error) => {
       console.error("Erreur lors de la récupération de la liste des éleveurs.", error);
     });
+  }
+  
 
   // Récupère les types de cheptel
   auth.axiosInstance

@@ -9,6 +9,7 @@
           id="nom"
           v-model="form.nom_berger"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -18,6 +19,7 @@
           type="text"
           id="prenom"
           v-model="form.prenom_berger"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -27,17 +29,9 @@
           type="text"
           id="tel"
           v-model="form.tel_berger"
+          :disabled="props.isReadOnly"
         />
       </div>
-      <!-- <div class="w3-half form-cell">
-        <label for="mail">Email:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="mail"
-          v-model="form.mail_berger"
-        />
-      </div> -->
       <div class="w3-half form-cell">
         <label for="adresse">Adresse:</label>
         <input
@@ -45,6 +39,7 @@
           type="text"
           id="adresse"
           v-model="form.adresse_berger"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -54,6 +49,7 @@
           type="text"
           id="comm"
           v-model="form.commentaire"
+          :disabled="props.isReadOnly"
         />
       </div>
       <!-- next id pour debug -->
@@ -63,7 +59,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -76,6 +72,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 

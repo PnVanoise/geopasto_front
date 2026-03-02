@@ -1,48 +1,36 @@
 <template>
   <form @submit.prevent="submitForm">
     <!-- Add your form fields here -->
-    <div
-      style="
+    <div style="
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
         align-items: stretch;
-      "
-    >
+      ">
       <div style="">
         <div class="form-cell">
           <label for="code_up">Code UP:</label>
-          <input
-            class="w3-input w3-border"
-            type="text"
-            id="code_up"
-            v-model="form.properties.code_up"
-            required
-          />
+          <input class="w3-input w3-border" type="text" id="code_up" v-model="form.properties.code_up" required
+            :disabled="props.isReadOnly" />
         </div>
         <div class="form-cell">
           <label for="nom_up">Nom UP:</label>
-          <input
-            class="w3-input w3-border"
-            type="text"
-            id="nom_up"
-            v-model="form.properties.nom_up"
-            required
-          />
+          <input class="w3-input w3-border" type="text" id="nom_up" v-model="form.properties.nom_up" required
+            :disabled="props.isReadOnly" />
+        </div>
+        <div class="form-cell">
+          <label for="secteur">Secteur:</label>
+          <input class="w3-input w3-border" type="text" id="secteur" v-model="form.properties.secteur"
+            :disabled="props.isReadOnly" />
         </div>
         <div class="form-cell">
           <label for="annee_version">Année version:</label>
-          <input
-            class="w3-input w3-border"
-            type="text"
-            id="annee_version"
-            v-model="form.properties.annee_version"
-            required
-          />
+          <input class="w3-input w3-border" type="text" id="annee_version" v-model="form.properties.annee_version"
+            required :disabled="props.isReadOnly" />
         </div>
         <div class="form-cell">
           <label for="active">Version active ?</label>
-          <input type="checkbox" id="active" v-model="form.properties.version_active" />
+          <input type="checkbox" id="active" v-model="form.properties.version_active" :disabled="props.isReadOnly" />
         </div>
         <!-- <div class="form-cell">
           <label for="proprietaire">Propriétaire :</label>
@@ -63,32 +51,20 @@
         <!-- Test grille 1 -->
         <div class="grid-container">
           <label>Situations :</label>
-          <Grid
-            :data="situationExploitations"
-            :columns="situGridColumns"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="situColumnLabels"
-            @edit="situOnEdit"
-            @delete="situOnDelete"
-          >
+          <Grid :data="situationExploitations" :columns="situGridColumns" :bgColor="'#f7ba0b'"
+            :columnLabels="situColumnLabels" :actions="gridActions" @edit="situOnEdit" @delete="situOnDelete">
           </Grid>
-          <button type="button" @click="goToAddSituation" class="w3-button w3-blue">
+          <button v-if="!isReadOnly" type="button" @click="goToAddSituation" class="w3-button w3-blue">
             Nouvelle situation d'exploitation
           </button>
         </div>
 
         <div class="grid-container">
           <label>Quartiers :</label>
-          <Grid
-            :data="quartiers"
-            :columns="quarGridColumns"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="quarColumnLabels"
-            @edit="quarOnEdit"
-            @delete="quarOnDelete"
-          >
+          <Grid :data="quartiers" :columns="quarGridColumns" :bgColor="'#f7ba0b'" :columnLabels="quarColumnLabels"
+            :actions="gridActions" @edit="quarOnEdit" @delete="quarOnDelete">
           </Grid>
-          <button type="button" @click="goToAddQuartier" class="w3-button w3-blue">
+          <button v-if="!isReadOnly" type="button" @click="goToAddQuartier" class="w3-button w3-blue">
             Nouveau quartier
           </button>
           <button type="button" @click="goToQuartiersList" class="w3-button w3-blue">
@@ -123,21 +99,17 @@
       <div style="">
         <div class="form-cell">
           Géométrie:
-          <MapEditMultipolygon2
-            :key="form.geometry.coordinates"
-            v-model="form.geometry"
-            :geometryType="'MultiPolygon'"
-            :referenceGeometry="refUPs"
-          />
+          <MapEditMultipolygon2 :key="form.geometry.coordinates" v-model="form.geometry" :geometryType="'MultiPolygon'"
+            :referenceGeometry="refUPs" />
         </div>
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
@@ -149,16 +121,37 @@ import Grid from "./Grid.vue";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 
 const refUPs = ref([]);
 
-const situGridColumns = ref(["id_situation", "nom_situation", "situation_active"]);
+const situGridColumns = ref(["nom_situation", "situation_active"]);
 const situColumnLabels = ref({
-  id_situation: "ID",
   nom_situation: "Nom",
   situation_active: "Active ?",
+});
+
+const gridActions = computed(() => {
+  if (props.isReadOnly) {
+    // En mode lecture seule → uniquement la vue
+    return {
+      view: true,
+      edit: false,
+      delete: false,
+    };
+  } else {
+    // En mode édition → tout est permis
+    return {
+      view: true,
+      edit: true,
+      delete: true,
+    };
+  }
 });
 
 const quarGridColumns = ref(["id", "code_quartier", "nom_quartier"]);
@@ -393,7 +386,9 @@ const deleteQuartier = (id) => {
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
 </style>

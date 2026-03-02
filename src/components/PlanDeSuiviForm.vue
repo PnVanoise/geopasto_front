@@ -9,6 +9,7 @@
           id="description"
           v-model="form.description"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -20,6 +21,7 @@
           v-model="form.date_debut"
           @keydown.prevent
           @paste.prevent
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -31,11 +33,17 @@
           v-model="form.date_fin"
           @keydown.prevent
           @paste.prevent
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
         <label for="typedesuivi">Type de suivi:</label>
-        <select class="w3-input w3-border" v-model="form.type_suivi" id="typedesuivi">
+        <select
+          class="w3-input w3-border"
+          v-model="form.type_suivi"
+          id="typedesuivi"
+          :disabled="props.isReadOnly"
+        >
           <option
             v-for="typesuivi in typesuivis"
             :key="typesuivi.id_type_suivi"
@@ -51,6 +59,7 @@
           class="w3-input w3-border"
           v-model="form.unite_pastorale"
           id="unitepastorale"
+          :disabled="props.isReadOnly"
         >
           <option v-for="up in ups.features" :key="up.id" :value="up.id">
             {{ up.properties.nom_up }}
@@ -64,7 +73,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -77,6 +86,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
 });
 

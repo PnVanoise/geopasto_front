@@ -7,7 +7,7 @@
       <div class="w3-container">
         <h2 class="w3-center">Liste des subventions</h2>
       </div>
-      <div v-if="suventions">
+      <div v-if="subventions">
         <div class="header-actions">
           <form id="search" class="search-form">
             Rechercher <input name="query" v-model="searchQuery" />
@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="suventions"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="subventionsWithExploitant" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -35,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 import auth from "../../auth";
@@ -43,26 +36,36 @@ import Grid from "./Grid.vue";
 import config from "../../config";
 import { useMainStore } from "../store";
 
-const suventions = ref([]);
+const subventions = ref([]);
 
 const isLoading = ref(true);
 const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_subvention", "description"]);
+const gridColumns = ref(["nom_exploitant", "description", "montant", "engage", "paye"]);
 const columnLabels = ref({
-  id_subvention: "ID",
+  nom_exploitant: "Bénéficiaire",
   description: "Description",
+  montant: "Montant",
+  engage: "Engagé",
+  paye: "Payé",
+});
+
+const subventionsWithExploitant = computed(() => {
+  return subventions.value.map(exp => ({
+    ...exp,
+    nom_exploitant: exp.exploitant_detail?.nom_exploitant || "",
+  }));
 });
 
 const fetchSubventions = () => {
   auth.axiosInstance
     .get(`${config.API_BASE_URL}/api/subventionPNV/`)
     .then((response) => {
-      suventions.value = response.data;
+      subventions.value = response.data;
       console.log("list response data:", response.data);
-      console.log("subventions.value:", suventions.value);
+      console.log("subventions.value:", subventions.value);
     })
     .catch((error) => {
       console.error("There was an error!", error);
@@ -83,6 +86,14 @@ function onEdit(entry) {
   console.log("Éditer:", entry.id_subvention);
 
   router.push(`/Subvention/edit/${entry.id_subvention}`);
+}
+
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/Subvention/edit/${entry.id_subvention}`,
+    query: { readonly: 'true' }
+  });
 }
 
 // Méthode pour gérer la suppression

@@ -1,4 +1,5 @@
 <template>
+  <p>Mode lecture seule : {{ isReadOnly }}</p>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
@@ -9,6 +10,7 @@
           id="nom"
           v-model="form.nom_propr"
           required
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -18,11 +20,18 @@
           type="text"
           id="nom"
           v-model="form.prenom_propr"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
         <label for="nom">Téléphone:</label>
-        <input class="w3-input w3-border" type="text" id="nom" v-model="form.tel_propr" />
+        <input
+          class="w3-input w3-border"
+          type="text"
+          id="nom"
+          v-model="form.tel_propr"
+          :disabled="props.isReadOnly"
+        />
       </div>
       <div class="w3-half form-cell">
         <label for="nom">Email:</label>
@@ -31,6 +40,7 @@
           type="text"
           id="nom"
           v-model="form.mail_propr"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -40,6 +50,7 @@
           type="text"
           id="nom"
           v-model="form.adresse_propr"
+          :disabled="props.isReadOnly"
         />
       </div>
       <div class="w3-half form-cell">
@@ -49,6 +60,7 @@
           type="text"
           id="nom"
           v-model="form.commentaire"
+          :disabled="props.isReadOnly"
         />
       </div>
       <!-- next id pour debug -->
@@ -58,7 +70,7 @@
         )
       </div>
     </div>
-    <button type="submit">Enregistrer</button>
+    <button v-if="!props.isReadOnly" type="submit">Enregistrer</button>
   </form>
 </template>
 
@@ -71,6 +83,10 @@ import auth from "../../auth";
 const props = defineProps({
   initialForm: Object,
   isEdit: Boolean,
+  isReadOnly: {
+    type: Boolean,
+    default: false
+  },
   onSubmit: Function,
 });
 

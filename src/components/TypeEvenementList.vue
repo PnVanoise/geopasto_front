@@ -17,15 +17,8 @@
           </span>
         </div>
         <div class="grid-container">
-          <Grid
-            :data="typeEvenements"
-            :columns="gridColumns"
-            :filter-key="searchQuery"
-            :bgColor="'#f7ba0b'"
-            :columnLabels="columnLabels"
-            @edit="onEdit"
-            @delete="onDelete"
-          >
+          <Grid :data="typeEvenements" :columns="gridColumns" :filter-key="searchQuery" :bgColor="'#f7ba0b'"
+            :columnLabels="columnLabels" @edit="onEdit" @view="onView" @delete="onDelete">
           </Grid>
         </div>
       </div>
@@ -50,10 +43,9 @@ const router = useRouter();
 const mainStore = useMainStore();
 
 const searchQuery = ref("");
-const gridColumns = ref(["id_type_evenement", "description"]);
+const gridColumns = ref(["description"]);
 const columnLabels = ref({
-  id_type_evenement: "ID",
-  description: "Desc.",
+  description: "Description",
 });
 
 const fetchTypeEvts = () => {
@@ -84,6 +76,13 @@ function onEdit(entry) {
   router.push(`/TypeEvenement/edit/${entry.id_type_evenement}`);
 }
 
+function onView(entry) {
+  console.log("View:", entry);
+  router.push({
+    path: `/TypeEvenement/edit/${entry.id_type_evenement}`,
+    query: { readonly: 'true' }
+  });
+}
 // Méthode pour gérer la suppression
 function onDelete(entry) {
   console.log("Supprimer:", entry.id_type_evenement);
@@ -174,8 +173,11 @@ onMounted(fetchTypeEvts);
 }
 
 .grid-container {
-  border-radius: 5px; /* Arrondi des coins de la grille */
-  overflow: hidden; /* Assure que le contenu s'adapte à l'arrondi */
+  border-radius: 5px;
+  /* Arrondi des coins de la grille */
+  overflow: hidden;
+  /* Assure que le contenu s'adapte à l'arrondi */
 }
+
 /* Ajoutez vos styles ici */
 </style>
