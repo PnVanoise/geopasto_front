@@ -156,7 +156,7 @@ const hasPermissionForModel = (modelName) => {
 <template>
   <div class="w3-center w3-signal-green header-container">
     <div class="title-container">
-      <h3>GeoPasto</h3>
+      <h2>GeoPasto</h2>
       <div class="auth_buttons">
         <div v-if="isAuthenticated">
           <Logout @loggedOut="handleLogout" />
@@ -196,7 +196,7 @@ const hasPermissionForModel = (modelName) => {
         'nav-item w3-signal-grey transparent',
         { active: route.path === '/CategoriesPension2' },
       ]">
-        <RouterLink to="/CategoriesPension2">Catégories d'animaux</RouterLink>
+        <RouterLink to="/CategoriesPension2">Catégories de pension</RouterLink>
       </div>
       <div v-if="hasPermissionForModel('categorie_animaux').value" :class="[
         'nav-item w3-signal-grey transparent',

@@ -1,10 +1,11 @@
 <template>
   <form @submit.prevent="login">
-    <input v-model="userCredentials.username" placeholder="Nom d'utilisateur" required />
-    <br />
-    <input type="password" v-model="userCredentials.password" placeholder="Mot de passe" required />
-    <br />
-    <button type="submit">Connexion</button>
+    <v-text-field variant="underlined"
+      density="compact" v-model="userCredentials.username" label="Nom d'utilisateur" required />
+    <v-text-field variant="underlined"
+      density="compact" v-model="userCredentials.password" label="Mot de passe" type="password" required />
+    <v-btn
+      class="submit-btn" density="compact" type="submit" color="info">Connexion</v-btn>
   </form>
 </template>
 
@@ -53,3 +54,20 @@ const login = async () => {
   }
 };
 </script>
+
+<style scoped>
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin: 5px;
+}
+.submit-btn {
+  align-self: flex-start;
+  margin-top: 0;
+}
+</style>
+<style scoped>
+
+
+</style>

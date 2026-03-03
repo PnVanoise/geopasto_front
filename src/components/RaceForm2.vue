@@ -1,11 +1,12 @@
 <template>
+  <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
         <v-text-field
           id="description"
           v-model="form.description"
-        :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
           label="Description"
           dense
           hide-details
@@ -19,7 +20,7 @@
           :items="especes"
           item-title="description"
           item-value="id_espece"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
           label="Espèce"
           dense
           hide-details
@@ -134,5 +135,9 @@ const closeModal = () => {
   align-items: center;
   gap: 0.5rem;
   margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
 }
 </style>

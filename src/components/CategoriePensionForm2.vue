@@ -1,4 +1,7 @@
 <template>
+  <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
+
+  
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">

@@ -17,29 +17,31 @@
       <!-- Rendu automatique des filtres -->
       <template v-if="props.showFilters" v-for="filter in props.filters" :key="filter.key">
         <!-- Checkbox -->
-        <label v-if="filter.type === 'checkbox'" style="margin: 0 10px;">
-          <input
-            type="checkbox"
-            :checked="activeFilters[filter.key]"
-            @change="onCheckboxChange($event, filter.key)"
+        <div v-if="filter.type === 'checkbox'" style="margin: 0 10px;">
+          <v-switch
+            v-model="activeFilters[filter.key]"
+            :label="filter.label"
+            dense
+            hide-details
+            density="compact"
           />
-          {{ filter.label }}
-        </label>
+        </div>
 
+        
         <!-- Select -->
-        <label v-if="filter.type === 'select'" style="margin: 0 10px;">
-          {{ filter.label }}
-          <select v-model="activeFilters[filter.key]">
-            <option value="">-- Tous --</option>
-            <option
-              v-for="opt in unref(filter.options) || []"
-              :key="opt.value ?? opt.label"
-              :value="opt.value ?? opt.label"
-            >
-              {{ opt.label }}
-            </option>
-          </select>
-        </label>
+        <div v-if="filter.type === 'select'" style="margin: 0 10px; min-width:200px;">
+          <v-select
+            :items="[{ value: '', label: '-- Tous --' }].concat(unref(filter.options) || [])"
+            item-title="label"
+            item-value="value"
+            v-model="activeFilters[filter.key]"
+            :label="filter.label"
+            dense
+            hide-details
+            clearable
+            density="compact"
+          />
+        </div>
       </template>
 
       
@@ -239,7 +241,7 @@ function handleDelete(item) {
 /* Search occupies one third on the left; Add button aligned to the right */
 .header-actions .search-field {
   flex: 0 0 33%;
-  min-width: 160px;
+  min-width: 240px;
 }
 
 .header-actions .add-btn {
