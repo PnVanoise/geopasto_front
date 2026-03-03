@@ -5,13 +5,14 @@
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="description">Description:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="description"
           v-model="form.description"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Description"
+          dense
+          hide-details
+          clearable
         />
       </div>
       <!-- next id pour debug -->
@@ -22,11 +23,9 @@
       </div>
     </div>
     
-    <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+   <div class="form-actions">
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -103,3 +102,17 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+<style scoped>
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>

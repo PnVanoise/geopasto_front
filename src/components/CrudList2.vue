@@ -73,7 +73,7 @@
       @delete="handleDelete"
     />
 
-    <Modal :show="crud.showModal.value" @close="crud.closeModal">
+    <Modal :show="crud.showModal.value" @close="crud.closeModal" :close-on-overlay="false">
       <component
         :is="formComponent"
         :initialForm="crud.selectedItem.value"

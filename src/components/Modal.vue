@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isShown" class="modal-overlay" @click.self="close">
+  <div v-if="isShown" class="modal-overlay" @click.self="handleOverlayClick">
     <div class="modal-content">
       <button class="modal-close" @click="close">x</button>
       <slot></slot>
@@ -11,7 +11,8 @@
 import { computed, unref } from 'vue'
 
 const props = defineProps({
-  show: [Boolean, Object]
+  show: [Boolean, Object],
+  closeOnOverlay: { type: Boolean, default: true }
 });
 const emit = defineEmits(["update:show", "close"]);
 
@@ -23,6 +24,10 @@ const close = () => {
   emit("update:show", false);
   // also emit a semantic close event
   emit("close");
+};
+
+const handleOverlayClick = () => {
+  if (props.closeOnOverlay) close();
 };
 </script>
 
