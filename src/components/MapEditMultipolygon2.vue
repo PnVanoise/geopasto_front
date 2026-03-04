@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, toRaw, nextTick } from "vue";
+import { onMounted, ref, watch, toRaw, nextTick, onBeforeUnmount } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw";
@@ -66,6 +66,12 @@ const props = defineProps({
     required: false,
     default: () => null,
   },
+  // Optional vector layers to display as overlays.
+  // Each entry: { id: String, label: String, data: Object|String (GeoJSON or URL), style: Function|Object, visible: Boolean }
+  vectorLayers: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -79,6 +85,9 @@ const editingMode = ref(false);
 const jsonCoordinates = ref("");
 
 let referenceLayer;
+let vectorLayerMap = {}; // id -> L.Layer
+let overlaysControl = null;
+let legendControl = null;
 
 // --- Initialisation ---
 onMounted(async () => {
@@ -93,7 +102,12 @@ onMounted(async () => {
   });
 
   // Contrôle des fonds de carte
-  L.control.layers(baseMaps).addTo(map);
+  // create overlays container (will be populated with vector layers)
+  const overlays = {};
+  overlaysControl = L.control.layers(baseMaps, overlays).addTo(map);
+  // update legend when overlays are toggled via the control
+  map.on('overlayadd', updateLegend);
+  map.on('overlayremove', updateLegend);
 
   // --- Synchronisation du zoom max selon le fond sélectionné ---
   map.on("baselayerchange", function (e) {
@@ -114,6 +128,11 @@ onMounted(async () => {
     displayReferenceGeometry();
     referenceLayer.addTo(map);
   }
+
+  // Add any provided vector layers as overlays
+  updateVectorLayers();
+  // add legend for vector layers
+  updateLegend();
 
   const myIcon = L.icon({
     iconUrl: `/images/marqueur_rouge.png`,
@@ -160,6 +179,220 @@ onMounted(async () => {
   }
 });
 
+// Update vector overlays based on props.vectorLayers
+function updateVectorLayers() {
+  if (!map) return;
+
+  // remove existing vector layers from map and control
+  Object.values(vectorLayerMap).forEach((layer) => {
+    try { map.removeLayer(layer); } catch (e) {}
+    try { overlaysControl && overlaysControl.removeLayer && overlaysControl.removeLayer(layer); } catch (e) {}
+  });
+  vectorLayerMap = {};
+
+  // helper to add a created layer into maps and control
+  const addOverlay = (id, label, layer, visible) => {
+    vectorLayerMap[id] = layer;
+    overlaysControl && overlaysControl.addOverlay && overlaysControl.addOverlay(layer, label);
+    if (visible) layer.addTo(map);
+  };
+
+  // create each layer (supports direct GeoJSON object or URL to fetch)
+  props.vectorLayers.forEach((vl, idx) => {
+    const id = vl.id || `vl_${idx}`;
+    const label = vl.label || id;
+    const style = vl.style || function() { return {}; };
+    const visible = !!vl.visible;
+
+    if (!vl.data) return;
+
+    if (typeof vl.data === 'string') {
+      // treat as URL
+      fetch(vl.data)
+        .then(res => res.json())
+        .then((geojson) => {
+          const layer = L.geoJSON(geojson, { style: vl.style, onEachFeature: vl.onEachFeature, pointToLayer: vl.pointToLayer || function(feature, latlng) {
+            // default point rendering: try to derive from style(feature) or fallback to circleMarker
+            try {
+              const s = (typeof vl.style === 'function') ? vl.style(feature) : (vl.style || {});
+              const color = (s && (s.fillColor || s.color)) || (vl.legend && (vl.legend.color || vl.legend.fillColor)) || '#1E90FF';
+              const radius = (s && (s.radius || s.pointRadius)) || (vl.legend && vl.legend.radius) || 6;
+              const legendFillOpacity = (vl.legend && typeof vl.legend.fillOpacity !== 'undefined') ? vl.legend.fillOpacity : undefined;
+              const fillOpacity = (typeof legendFillOpacity !== 'undefined') ? legendFillOpacity : (s && typeof s.fillOpacity !== 'undefined' ? s.fillOpacity : (s && s.fill ? 1 : 0.85));
+              const weight = (s && (s.weight || s.strokeWidth)) || (vl.legend && vl.legend.weight) || 1;
+              return L.circleMarker(latlng, { radius: radius, color: color, fillColor: color, fillOpacity: fillOpacity, weight: weight });
+            } catch (e) {
+              return L.marker(latlng);
+            }
+          } });
+          addOverlay(id, label, layer, visible);
+        })
+        .catch(err => console.error("Failed to load vector layer:", vl.data, err));
+      } else {
+      // assume GeoJSON object
+      const layer = L.geoJSON(vl.data, { style: vl.style, onEachFeature: vl.onEachFeature, pointToLayer: vl.pointToLayer || function(feature, latlng) {
+        try {
+          const s = (typeof vl.style === 'function') ? vl.style(feature) : (vl.style || {});
+          const color = (s && (s.fillColor || s.color)) || (vl.legend && (vl.legend.color || vl.legend.fillColor)) || '#1E90FF';
+          const radius = (s && (s.radius || s.pointRadius)) || (vl.legend && vl.legend.radius) || 6;
+          const legendFillOpacity = (vl.legend && typeof vl.legend.fillOpacity !== 'undefined') ? vl.legend.fillOpacity : undefined;
+          const fillOpacity = (typeof legendFillOpacity !== 'undefined') ? legendFillOpacity : (s && typeof s.fillOpacity !== 'undefined' ? s.fillOpacity : (s && s.fill ? 1 : 0.85));
+          const weight = (s && (s.weight || s.strokeWidth)) || (vl.legend && vl.legend.weight) || 1;
+          return L.circleMarker(latlng, { radius: radius, color: color, fillColor: color, fillOpacity: fillOpacity, weight: weight });
+        } catch (e) {
+          return L.marker(latlng);
+        }
+      } });
+      addOverlay(id, label, layer, visible);
+    }
+  });
+  // update legend after overlays changed
+  updateLegend();
+}
+
+// Build or update the legend control based on current vectorLayers
+function updateLegend() {
+  if (!map) return;
+
+  // remove existing legend
+  if (legendControl) {
+    try { legendControl.remove(); } catch (e) {}
+    legendControl = null;
+  }
+
+  const layers = props.vectorLayers || [];
+  if (!layers || layers.length === 0) return;
+
+  // only include layers that are currently added to the map
+  const visibleLayers = layers.filter((vl, idx) => {
+    const id = vl.id || `vl_${idx}`;
+    const layer = vectorLayerMap[id];
+    return layer && map.hasLayer(layer);
+  });
+  if (visibleLayers.length === 0) return;
+
+  legendControl = L.control({ position: 'bottomright' });
+  legendControl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'leaflet-legend');
+    div.style.background = 'white';
+    div.style.padding = '6px';
+    div.style.borderRadius = '4px';
+    div.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+    div.style.fontSize = '12px';
+    div.innerHTML = '<strong>Légende</strong><br/>';
+
+    visibleLayers.forEach((vl) => {
+      const label = vl.legend?.label || vl.label || vl.id || '';
+
+      // if explicit legend icon HTML provided, use it
+      if (vl.legend && vl.legend.iconHtml) {
+        const iconHtml = vl.legend.iconHtml;
+        div.innerHTML += `<div style="margin-bottom:6px;">${iconHtml}<span style="margin-left:8px">${label}</span></div>`;
+        return;
+      }
+
+      // fallback to swatch derived from legend or style (supports style function)
+      let color = vl.legend?.color || '#3388ff';
+      let fill = vl.legend?.fill ?? false;
+      let strokeW = null;
+      let radius = null;
+
+      // prefer explicit geometry hints first (parent can declare geometryType or legend.symbol)
+      const explicitPoint = (vl.geometryType === 'Point') || (vl.legend && vl.legend.symbol === 'point');
+      const features = (vl.data && vl.data.features) || [];
+      let hasPoint = false;
+      let sampleFeature = null;
+      if (!explicitPoint) {
+        hasPoint = features.some((f) => f && f.geometry && f.geometry.type === 'Point');
+        sampleFeature = hasPoint ? features.find((f) => f && f.geometry && f.geometry.type === 'Point') : (features[0] || null);
+      } else {
+        // if caller explicitly declared Point, prefer any Point feature as sample if present, otherwise first feature
+        sampleFeature = features.find((f) => f && f.geometry && f.geometry.type === 'Point') || (features[0] || null);
+        hasPoint = explicitPoint;
+      }
+
+      // Resolve a style object `s` whether vl.style is a function or an object
+      let s = null;
+      try {
+        if (typeof vl.style === 'function') {
+          s = vl.style(sampleFeature || {});
+        } else if (vl.style && typeof vl.style === 'object') {
+          s = vl.style;
+        }
+      } catch (e) {
+        s = null;
+      }
+
+      if (s) {
+        color = vl.legend?.color || s.color || s.fillColor || color;
+        // prefer explicit vl.legend.fill when present, otherwise check style
+        if (typeof vl.legend?.fill === 'boolean') fill = vl.legend.fill;
+        else fill = !!s.fill || !!s.fillOpacity || fill;
+        strokeW = s.weight || s.strokeWidth || null;
+        radius = s.radius || s.pointRadius || null;
+      }
+
+      // Also allow legend hints to override
+      if (vl.legend) {
+        strokeW = strokeW || vl.legend.weight || null;
+        radius = radius || vl.legend.radius || null;
+      }
+
+      // Decide swatch type: point, polygon, line, or filled polygon. Prefer explicit hints first.
+      const geomType = sampleFeature && sampleFeature.geometry ? sampleFeature.geometry.type : null;
+      const pointLike = explicitPoint || geomType === 'Point' || hasPoint || !!radius;
+      const explicitPolygon = (vl.geometryType && (vl.geometryType.indexOf('Polygon') >= 0)) || (vl.legend && vl.legend.symbol === 'polygon');
+      const polygonLike = explicitPolygon || geomType === 'Polygon' || geomType === 'MultiPolygon';
+
+      console.log("Legend item:", label, "color:", color, "fill:", fill, "strokeW:", strokeW, "radius:", radius, "pointLike:", pointLike, "geomType:", geomType);
+
+      let swatchHtml = '';
+      try {
+        if (pointLike) {
+          const r = (radius && !isNaN(radius)) ? Math.max(3, Math.min(10, radius)) : 6;
+          const weight = (vl.legend && vl.legend.weight) || (s && (s.weight || s.strokeWidth)) || 1;
+          // SVG diameter should match marker visual: diameter + stroke, add tiny padding
+          const svgDiameter = Math.ceil((r + weight) * 2 + 2);
+          const cx = svgDiameter / 2;
+          const cy = svgDiameter / 2;
+          const legendFillOpacity = (vl.legend && typeof vl.legend.fillOpacity !== 'undefined') ? vl.legend.fillOpacity : undefined;
+          const sFillOpacity = (s && typeof s.fillOpacity !== 'undefined') ? s.fillOpacity : undefined;
+          const fillOpacity = (typeof legendFillOpacity !== 'undefined') ? legendFillOpacity : (typeof sFillOpacity !== 'undefined' ? sFillOpacity : (fill ? 1 : 0));
+          const fillColor = (vl.legend && vl.legend.fillColor) || (s && (s.fillColor || s.color)) || color;
+          swatchHtml = `<svg width="${svgDiameter}" height="${svgDiameter}" style="vertical-align:middle;margin-right:8px"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${fillColor}" stroke="${color}" stroke-width="${weight}" fill-opacity="${fillOpacity}"/></svg>`;
+        } else if (polygonLike) {
+          // polygon swatch: show an outlined polygon (rect) using stroke and optional fill
+          const sw = 20;
+          const bg = fill ? color : 'transparent';
+          const strokeWidth = (strokeW && Math.max(1, Math.min(6, strokeW))) || 1;
+          swatchHtml = `<svg width="${sw}" height="14" style="vertical-align:middle;margin-right:8px"><rect x="0" y="0" width="${sw}" height="14" fill="${bg}" stroke="${color}" stroke-width="${strokeWidth}"/></svg>`;
+        } else if (strokeW) {
+          const stroke = color;
+          const w = 34;
+          const h = 14;
+          const y = h / 2;
+          const strokeWidth = Math.max(1, Math.min(6, strokeW));
+          swatchHtml = `<svg width="${w}" height="${h}" style="vertical-align:middle;margin-right:8px"><line x1="2" y1="${y}" x2="${w-2}" y2="${y}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round"/></svg>`;
+        } else {
+          const sw = 18;
+          const bg = fill ? color : 'transparent';
+          swatchHtml = `<svg width="${sw}" height="12" style="vertical-align:middle;margin-right:8px"><rect x="0" y="0" width="${sw}" height="12" fill="${bg}" stroke="${color}" stroke-width="1"/></svg>`;
+        }
+      } catch (e) {
+        swatchHtml = `<i style="display:inline-block;width:18px;height:12px;margin-right:8px;border:1px solid ${color};background:${fill ? color : 'transparent'}"></i>`;
+      }
+
+      div.innerHTML += `<div style="margin-bottom:4px;">${swatchHtml}<span style="vertical-align:middle">${label}</span></div>`;
+    });
+
+    // prevent clicks on legend from propagating to the map
+    L.DomEvent.disableClickPropagation(div);
+    return div;
+  };
+
+  legendControl.addTo(map);
+}
+
 // --- Watchers ---
 watch(
   () => props.modelValue,
@@ -183,6 +416,33 @@ watch(
   },
   { deep: true }
 );
+
+// Watch vectorLayers prop to update overlays dynamically
+watch(
+  () => props.vectorLayers,
+  () => {
+    updateVectorLayers();
+  },
+  { deep: true }
+);
+
+onBeforeUnmount(() => {
+  // remove legend control
+  if (legendControl) {
+    try { legendControl.remove(); } catch (e) {}
+    legendControl = null;
+  }
+  // remove overlays control
+  if (overlaysControl) {
+    try { overlaysControl.remove(); } catch (e) {}
+    overlaysControl = null;
+  }
+  // remove vector layers
+  Object.values(vectorLayerMap).forEach((layer) => {
+    try { map.removeLayer(layer); } catch (e) {}
+  });
+  vectorLayerMap = {};
+});
 
 // --- Fonctions d'affichage ---
 function displayReferenceGeometry() {
