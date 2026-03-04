@@ -98,9 +98,14 @@
       </div>
       <div style="">
         <div class="form-cell">
-          Géométrie:
-          <MapEditMultipolygon2 :key="form.geometry.coordinates" v-model="form.geometry" :geometryType="'MultiPolygon'"
-            :referenceGeometry="refUPs" />
+              Géométrie:
+              <MapEditMultipolygon2
+                :key="form.geometry.coordinates"
+                v-model="form.geometry"
+                :geometryType="'MultiPolygon'"
+                :referenceGeometry="refUPs"
+                :vector-layers="vectorLayers"
+              />
         </div>
       </div>
     </div>
@@ -164,6 +169,16 @@ const quarColumnLabels = ref({
 // const proprietaires = ref([]);
 const situationExploitations = ref([]);
 const quartiers = ref([]);
+const quartiersGeoJSON = ref(null);
+const evenementsGeoJSON = ref(null);
+const evenements = ref([]);
+
+const evenGridColumns = ref(["id", "properties.description", "properties.date_evenement"]);
+const evenColumnLabels = ref({
+  id: "ID",
+  "properties.description": "Description",
+  "properties.date_evenement": "Date",
+});
 
 const goToAddSituation = () => {
   // Utilisation de l'ID de l'UP pour la navigation
@@ -179,7 +194,7 @@ const goToAddSituation = () => {
 };
 
 const goToAddQuartier = () => {
-  // Utilisation de l'ID de l'UP pour la navigation
+  // Utilisation de l'ID de l'UP pour la navigations
   if (form.value.id) {
     console.log("form.value.id : ", form.value.id);
     router.push({
@@ -226,6 +241,10 @@ const fetchQuartiers = () => {
             id: feature.id, // Ajoute l'id
           };
         });
+        // keep the full GeoJSON for map overlay
+        quartiersGeoJSON.value = data;
+      } else {
+        quartiersGeoJSON.value = null;
       }
     })
     .catch((error) => {
@@ -258,7 +277,106 @@ const fetchRefUPs = () => {
     });
 };
 
+const fetchEvenements = () => {
+  if (!form.value.id) return;
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/evenement/?up_id=${form.value.id}`)
+    .then((response) => {
+      const data = response.data;
+      // If API returns FeatureCollection, use it directly
+      if (data && data.type === "FeatureCollection") {
+        evenementsGeoJSON.value = data;
+        // build list for grid
+        evenements.value = data.features.map(f => ({ id: f.id ?? f.properties?.id, properties: f.properties || {}, geometry: f.geometry }));
+      } else if (Array.isArray(data)) {
+        // Try to convert array of features to FeatureCollection
+        const features = data
+          .map((item) => {
+            if (item.geometry) return item;
+            // try to construct from lat/lng fields if present
+            if (item.longitude != null && item.latitude != null) {
+              return {
+                type: "Feature",
+                geometry: { type: "Point", coordinates: [item.longitude, item.latitude] },
+                properties: item,
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
+        if (features.length > 0) {
+          evenementsGeoJSON.value = { type: "FeatureCollection", features };
+          evenements.value = features.map(f => ({ id: f.id ?? f.properties?.id, properties: f.properties || {}, geometry: f.geometry }));
+        } else {
+          evenementsGeoJSON.value = null;
+          evenements.value = [];
+        }
+      } else {
+        evenementsGeoJSON.value = null;
+        evenements.value = [];
+      }
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération des événements!", error);
+      evenementsGeoJSON.value = null;
+      evenements.value = [];
+    });
+};
+
 const form = ref({ ...props.initialForm });
+
+// prepare vectorLayers for the map: include quartiers and evenements when available
+const vectorLayers = computed(() => {
+  const layers = [];
+  if (quartiersGeoJSON.value) {
+    layers.push({
+      id: "quartiers",
+      label: "Quartiers",
+      data: quartiersGeoJSON.value,
+      visible: true,
+      style: {
+        color: "#00E5FF",
+        weight: 3,
+        fill: false,
+      },
+      onEachFeature: (feature, layer) => {
+        const props = feature.properties || {};
+        const title = props.nom_quartier || props.code_quartier || "Quartier";
+        layer.bindPopup(title);
+      },
+    });
+  }
+
+  if (evenementsGeoJSON.value) {
+    layers.push({
+      id: "evenements",
+      label: "Événements",
+      data: evenementsGeoJSON.value,
+      visible: true,
+      // use point style for events (if points), fallback to red outline for polygons
+      style: (feature) => {
+        if (feature.geometry && feature.geometry.type === "Point") return {
+          radius: 8,
+          color: "#F4511E",
+          fillColor: "#F4511E",
+          fillOpacity: 0,
+          weight: 2,
+        };
+        // markers default
+        return { color: "#ff3333", weight: 2, fill: false };
+      },
+      onEachFeature: (feature, layer) => {
+        const props = feature.properties || {};
+        const title = props.description || props.source || "Événement";
+        const date = props.date_evenement || props.date_observation || null;
+        const content = date ? `${title}<br/><small>${date}</small>` : title;
+        layer.bindPopup(content);
+      },
+    });
+  }
+
+  return layers;
+});
 
 const router = useRouter();
 
@@ -323,6 +441,7 @@ watch(
       fetchSituations();
       fetchQuartiers();
       fetchRefUPs();
+      fetchEvenements();
     }
   }
 );
