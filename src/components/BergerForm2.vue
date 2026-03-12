@@ -2,69 +2,65 @@
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="nom">Nom:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="nom"
           v-model="form.nom_berger"
-          required
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Nom"
+          dense
+          hide-details
+          clearable
         />
       </div>
       <div class="w3-half form-cell">
-        <label for="prenom">Prénom:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="prenom"
           v-model="form.prenom_berger"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Prénom"
+          dense
+          hide-details
+          clearable
         />
       </div>
       <div class="w3-half form-cell">
-        <label for="tel">Téléphone:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="tel"
           v-model="form.tel_berger"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Téléphone"
+          dense
+          hide-details
+          clearable
         />
       </div>
       <div class="w3-half form-cell">
-        <label for="adresse">Adresse:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="adresse"
           v-model="form.adresse_berger"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Adresse"
+          dense
+          hide-details
+          clearable
         />
       </div>
       <div class="w3-half form-cell">
-        <label for="comm">Commentaire:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="comm"
           v-model="form.commentaire"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Commentaire"
+          dense
+          hide-details
+          clearable
         />
-      </div>
-      <!-- next id pour debug -->
-      <div v-if="props.mode === 'add'" class="form-cell">
-        (Next ID:
-        {{ nextId }}
-        )
       </div>
     </div>
     
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -145,3 +141,18 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+
+
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>

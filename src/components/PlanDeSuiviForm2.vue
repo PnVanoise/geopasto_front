@@ -2,8 +2,8 @@
   <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
-      <div class="w3-half form-cell">
-        <v-text-field
+      <div class="form-cell">
+        <v-text-field 
           id="description"
           v-model="form.description"
           :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
@@ -13,13 +13,39 @@
           clearable
         />
       </div>
+    </div>
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">        
+        <v-text-field type="date" label="Date de début" v-model="form.date_debut" :class="{ 'disable-events': props.mode === 'view' || !can('change') }" dense hide-details clearable />
+      </div>
       <div class="w3-half form-cell">
-        
-        <v-text-field
-          id="categorie"
-          v-model="form.categorie"
+        <v-text-field type="date" label="Date de fin" v-model="form.date_fin" :class="{ 'disable-events': props.mode === 'view' || !can('change') }" dense hide-details clearable />
+      </div>
+    </div>
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">
+        <v-select
+          id="situation"
+          v-model="form.type_suivi"
+          :items="typesuivis"
+          item-title="description"
+          item-value="id_type_suivi"
           :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
-          label="Catégorie"
+          label="Type de suivi"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-select
+          id="berger"
+          v-model="form.unite_pastorale"
+          :items="ups.features"
+          item-title="properties.nom_up"
+          item-value="id"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Unité pastorale"
           dense
           hide-details
           clearable
@@ -48,7 +74,7 @@ const props = defineProps({
   onClose: Function,
 });
 
-const { can } = usePermissions("typeequipement");
+const { can } = usePermissions("plandesuivi");
 
 const formTitle = computed(() => {
   if (props.mode === "add") return `Ajouter ${props.itemLabel}`;
@@ -63,12 +89,16 @@ const btTitle = computed(() => {
   return "";
 });
 
-// Formulaire réactif
 const form = reactive({
-  id_type_equipement: null,
   description: "",
-  categorie: "",
+  date_debut: "",
+  date_fin: "",
+  type_suivi: "",
+  unite_pastorale: "",
 });
+
+const typesuivis = ref([]);
+const ups = ref([]);
 
 watch(
   () => props.initialForm,
@@ -82,20 +112,50 @@ watch(
 
 // Next ID pour l'ajout
 const nextId = ref(null);
+
 onMounted(() => {
   if (props.mode === "add") {
     auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/typeEquipement/getNextId/`)
-      .then(res => {
-        nextId.value = res.data.next_id;
-        form.id_type_equipement = nextId.value;
+      .get(`${config.API_BASE_URL}/api/planSuivi/getNextId/`)
+      .then((response) => {
+        nextId.value = response.data.next_id;
+        form.id_plan_suivi = nextId.value; // Optionnel: lier cet ID au formulaire si besoin
       })
-      .catch(err => console.error("Erreur Next ID", err));
+      .catch((error) => {
+        console.error("Erreur lors de la récupération du Next ID", error);
+      });
   }
+
+  // Récupère les types de suivi
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/typeSuivi/`)
+    .then((response) => {
+      typesuivis.value = response.data;
+    })
+    .catch((error) => {
+      console.error(
+        "Erreur lors de la récupération de la liste des types de suivi",
+        error
+      );
+    });
+
+  // Récupère les unités pastorales
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/unitePastorale/`)
+    .then((response) => {
+      ups.value = response.data;
+      console.log("ups:", ups.value);
+    })
+    .catch((error) => {
+      console.error(
+        "Erreur lors de la récupération de la liste des unités pastorales",
+        error
+      );
+    });
 });
 
 
-// Submit
+// Submits
 const submitForm = () => {
   if (props.onSubmit) {
     props.onSubmit(form)
@@ -109,6 +169,8 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+
+
 <style scoped>
 .form-actions {
   display: flex;

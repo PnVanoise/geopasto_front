@@ -27,12 +27,6 @@
           clearable
         />
       </div>
-      <!-- next id pour debug -->
-      <div v-if="props.mode === 'add'" class="form-ligne">
-        (Next ID:
-        {{ nextId }}
-        )
-      </div>
     </div>
     
     <div class="form-actions">

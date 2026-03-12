@@ -1,94 +1,61 @@
 <template>
   <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
-
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="situation">Situation:</label>
-        <select
-          class="w3-input w3-border"
-          v-model="form.situation_exploitation"
+        <v-select
           id="situation"
-          :disabled="props.mode === 'view' || !can('change')"
-        >
-          <option
-            v-for="situation in situations"
-            :key="situation.id_situation"
-            :value="situation.id_situation"
-          >
-            {{ situation.nom_situation }}
-          </option>
-        </select>
+          v-model="form.situation_exploitation"
+          :items="situations"
+          item-title="nom_situation"
+          item-value="id_situation"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Situation d'exploitation"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="berger">Berger:</label>
-        <select
-          class="w3-input w3-border"
-          v-model="form.berger"
+        <v-select
           id="berger"
-          :disabled="props.mode === 'view' || !can('change')"
-        >
-          <option
-            v-for="berger in bergers"
-            :key="berger.id_berger"
-            :value="berger.id_berger"
-          >
-            {{ berger.prenom_berger }} {{ berger.nom_berger }}
-          </option>
-        </select>
+          v-model="form.berger"
+          :items="bergers"
+          item-title="fullName"
+          item-value="id_berger"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Berger"
+          dense
+          hide-details
+          clearable
+        />
       </div>
     </div>
     <div class="w3-row form-ligne">
-      <div class="w3-half form-cell">
-        <label for="dateDebut">Date de début:</label>
-        <input
-          class="w3-input w3-border"
-          type="date"
-          id="dateDebut"
-          v-model="form.date_debut"
-          @keydown.prevent
-          @paste.prevent
-          :disabled="props.mode === 'view' || !can('change')"
-        />
+      <div class="w3-half form-cell">        
+        <v-text-field type="date" label="Date de début" v-model="form.date_debut" :class="{ 'disable-events': props.mode === 'view' || !can('change') }" dense hide-details clearable />
       </div>
       <div class="w3-half form-cell">
-        <label for="dateFin">Date de fin:</label>
-        <input
-          class="w3-input w3-border"
-          type="date"
-          id="dateFin"
-          v-model="form.date_fin"
-          @keydown.prevent
-          @paste.prevent
-          :disabled="props.mode === 'view' || !can('change')"
-        />
+        <v-text-field type="date" label="Date de fin" v-model="form.date_fin" :class="{ 'disable-events': props.mode === 'view' || !can('change') }" dense hide-details clearable />
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="form-cell">
-        <label for="commentaire">Commentaire:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-text-field
           id="commentaire"
           v-model="form.commentaire"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Commentaire"
+          dense
+          hide-details
+          clearable
         />
       </div>
     </div>
-    <div class="w3-row form-ligne">
-      <!-- next id pour debug -->
-      <div v-if="props.mode === 'add'" class="form-cell">
-        (Next ID:
-        {{ nextId }}
-        )
-      </div>
-    </div>
+    
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -164,7 +131,7 @@ onMounted(() => {
     .get(`${config.API_BASE_URL}/api/situationExploitation/`)
     .then((response) => {
       situations.value = response.data;
-      console.log("situations:", situations.value);
+      // console.log("situations:", situations.value);
     })
     .catch((error) => {
       console.error(
@@ -177,8 +144,12 @@ onMounted(() => {
   auth.axiosInstance
     .get(`${config.API_BASE_URL}/api/berger/`)
     .then((response) => {
-      bergers.value = response.data;
-      console.log("bergers:", bergers.value);
+      // Ajoute un champ `fullName` pour l'affichage dans le v-select
+      bergers.value = response.data.map((b) => ({
+        ...b,
+        fullName: `${b.nom_berger} ${b.prenom_berger}`,
+      }));
+      // console.log("bergers (with fullName):", bergers.value);
     })
     .catch((error) => {
       console.error("Erreur lors de la récupération de la liste des bergers.", error);
@@ -200,3 +171,18 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>
+

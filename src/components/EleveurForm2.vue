@@ -4,7 +4,17 @@
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="nom">Nom:</label>
+        <v-text-field
+          id="nom"
+          v-model="form.nom_eleveur"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Nom"
+          dense
+          hide-details
+          clearable
+        />
+
+        <!-- <label for="nom">Nom:</label>
         <input
           class="w3-input w3-border"
           type="text"
@@ -12,77 +22,105 @@
           v-model="form.nom_eleveur"
           required
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
-        <label for="Prénom">Prénom:</label>
+        
+        <v-text-field
+          id="prenom"
+          v-model="form.nom_eleveur"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Préom"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="Prénom">Prénom:</label>
         <input
           class="w3-input w3-border"
           type="text"
           id="nom"
           v-model="form.prenom_eleveur"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="nom">Téléphone:</label>
+        <v-text-field
+          id="tel"
+          v-model="form.tel_eleveur"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Téléphone"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="nom">Téléphone:</label>
         <input
           class="w3-input w3-border"
           type="text"
           id="nom"
           v-model="form.tel_eleveur"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
-        <label for="nom">Email:</label>
+        <v-text-field
+          id="mail"
+          v-model="form.mail_eleveur"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Email"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="nom">Email:</label>
         <input
           class="w3-input w3-border"
           type="text"
           id="nom"
           v-model="form.mail_eleveur"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="nom">Adresse:</label>
+        <v-text-field
+          id="adresse"
+          v-model="form.adresse_eleveur"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Adresse"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="nom">Adresse:</label>
         <input
           class="w3-input w3-border"
           type="text"
           id="nom"
           v-model="form.adresse_eleveur"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
-        <label for="nom">Commentaire:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="nom"
+        <v-text-field
+          id="commentaire"
           v-model="form.commentaire"
-          :disabled="props.mode === 'view' || !can('change')"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Commentaire"
+          dense
+          hide-details
+          clearable
         />
-      </div>
-    </div>
-
-    <div class="w3-row form-ligne">
-      <div v-if="props.mode === 'add'" class="form-cell">
-        (Next ID:
-        {{ nextId }}
-        )
       </div>
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -165,3 +203,16 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>

@@ -1,44 +1,37 @@
 <template>
-  <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
-
-  
+  <h3 class="w3-center w3-margin">{{ formTitle }}</h3>  
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="description">Description:</label>
-        <input
-          class="w3-input w3-border"
-          v-model="form.description"
+        <v-text-field
           id="description"
-          :disabled="props.isReadOnly"
+          v-model="form.description"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Description"
+          dense
+          hide-details
+          clearable
         />
       </div>
       <div class="w3-half form-cell">
-        <label for="espece">Espèce:</label>
-        <select
-          class="w3-input w3-border"
+        <v-select
           id="espece"
           v-model="form.espece"
-          :disabled="props.mode === 'view' || !can('change')"
-        >
-          <option v-for="espece in especes" :key="espece.id_espece" :value="espece.id_espece">
-            {{ espece.description }}
-          </option>
-        </select>
-      </div>
-      <!-- next id pour debug -->
-      <div v-if="props.mode === 'add'" class="form-ligne">
-        (Next ID:
-        {{ nextId }}
-        )
+          :items="especes"
+          item-title="description"
+          item-value="id_espece"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Espèce"
+          dense
+          hide-details
+          clearable
+        />
       </div>
     </div>
     
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -128,3 +121,18 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>
+
+

@@ -263,10 +263,16 @@ const hasPermissionForModel = (modelName) => {
     <div ref="accAdmi" class="w3-hide w3-white w3-card">
       <div :class="[
         'nav-item w3-signal-yellow transparent',
+        { active: route.path === '/ProprietaireFonciers2' },
+      ]">
+        <RouterLink to="/ProprietaireFonciers2">Propriétaires</RouterLink>
+      </div>
+      <!-- <div :class="[
+        'nav-item w3-signal-yellow transparent',
         { active: route.path === '/ProprietaireFonciers' },
       ]">
         <RouterLink to="/ProprietaireFonciers">Propriétaires</RouterLink>
-      </div>
+      </div> -->
 
       <!-- Teste les persmissions sur le modèle -->
       <div v-if="hasPermissionForModel('unitepastorale').value" :class="[
@@ -296,6 +302,12 @@ const hasPermissionForModel = (modelName) => {
         <RouterLink to="/Conventions">Conventions d'exploitation</RouterLink>
       </div>
 
+      <div :class="[
+        'nav-item w3-signal-orange transparent',
+        { active: route.path === '/SituationExploitations' },
+      ]">
+        <RouterLink to="/SituationExploitations">Situations d'exploitation  2</RouterLink>
+      </div>
       <div :class="[
         'nav-item w3-signal-orange transparent',
         { active: route.path === '/SituationExploitations' },
@@ -358,7 +370,13 @@ const hasPermissionForModel = (modelName) => {
       Plans et Mesures <i class="fa fa-caret-down"></i>
     </div>
     <div ref="accPlan" class="w3-hide w3-white w3-card">
-      
+      <div :class="[
+        'nav-item w3-signal-red transparent',
+        { active: route.path === '/PlanSuivis2' },
+      ]">
+        <RouterLink to="/PlanSuivis2">Plans par alpage 2</RouterLink>
+      </div>
+
       <div :class="[
         'nav-item w3-signal-red transparent',
         { active: route.path === '/PlanSuivis' },
@@ -366,6 +384,13 @@ const hasPermissionForModel = (modelName) => {
         <RouterLink to="/PlanSuivis">Plans par alpage</RouterLink>
       </div>
       
+      <div :class="[
+        'nav-item w3-signal-red transparent',
+        { active: route.path === '/MesurePlans' },
+      ]">
+        <RouterLink to="/MesurePlans">Mesures de suivi</RouterLink>
+      </div>
+
       <div :class="[
         'nav-item w3-signal-red transparent',
         { active: route.path === '/MesurePlans' },

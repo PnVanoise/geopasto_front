@@ -4,22 +4,65 @@
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
         <v-text-field
-          id="description"
-          v-model="form.description"
+          id="nom"
+          v-model="form.nom_propr"
           :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
-          label="Description"
+          label="Nom"
           dense
           hide-details
           clearable
         />
       </div>
       <div class="w3-half form-cell">
-        
         <v-text-field
-          id="categorie"
-          v-model="form.categorie"
+          id="prenom"
+          v-model="form.prenom_propr"
           :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
-          label="Catégorie"
+          label="Prénom"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field
+          id="telephone"
+          v-model="form.tel_propr"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Téléphone"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field
+          id="email"
+          v-model="form.mail_propr"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Email"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field
+          id="adresse"
+          v-model="form.adresse_propr"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Adresse"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field
+          id="commentaire"
+          v-model="form.commentaire"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Commentaire"
           dense
           hide-details
           clearable
@@ -48,7 +91,7 @@ const props = defineProps({
   onClose: Function,
 });
 
-const { can } = usePermissions("typeequipement");
+const { can } = usePermissions("proprietairefoncier");
 
 const formTitle = computed(() => {
   if (props.mode === "add") return `Ajouter ${props.itemLabel}`;
@@ -65,9 +108,13 @@ const btTitle = computed(() => {
 
 // Formulaire réactif
 const form = reactive({
-  id_type_equipement: null,
-  description: "",
-  categorie: "",
+  id_proprietaire: null,
+  nom_propr: "",
+  prenom_propr: "",
+  tel_propr: "",
+  mail_propr: "",
+  adresse_propr: "",
+  commentaire: "",
 });
 
 watch(
@@ -85,10 +132,10 @@ const nextId = ref(null);
 onMounted(() => {
   if (props.mode === "add") {
     auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/typeEquipement/getNextId/`)
+      .get(`${config.API_BASE_URL}/api/proprietaireFoncier/getNextId/`)
       .then(res => {
         nextId.value = res.data.next_id;
-        form.id_type_equipement = nextId.value;
+        form.id_proprietaire = nextId.value;
       })
       .catch(err => console.error("Erreur Next ID", err));
   }

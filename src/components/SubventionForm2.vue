@@ -4,7 +4,16 @@
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="description">Description:</label>
+        <v-text-field
+          id="description"
+          v-model="form.description"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Description"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="description">Description:</label>
         <input
           class="w3-input w3-border"
           type="text"
@@ -12,9 +21,19 @@
           v-model="form.description"
           required
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
+        <v-text-field
+          id="montant"
+          v-model="form.montant"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Montant"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="montant">Montant:</label>
         <label for="montant">Montant:</label>
         <input
           class="w3-input w3-border"
@@ -22,28 +41,58 @@
           id="nom"
           v-model="form.montant"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
-        <label for="engage">Engagé:</label>
+        <v-switch
+          id="engage"
+          v-model="form.engage"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Engagé ?"
+          color="primary"
+          dense
+          hide-details
+        />
+        <!-- <label for="engage">Engagé:</label>
         <input
           type="checkbox"
           id="active"
           v-model="form.engage"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
-        <label for="paye">Payé:</label>
+        <v-switch
+          id="paye"
+          v-model="form.paye"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Payé ?"
+          color="primary"
+          dense
+          hide-details
+        />
+        <!-- <label for="paye">Payé:</label>
         <input
           type="checkbox"
           id="active"
           v-model="form.paye"
           :disabled="props.mode === 'view' || !can('change')"
-        />
+        /> -->
       </div>
       <div class="w3-half form-cell">
-        <label for="exploitant">Exploitant:</label>
+        <v-select
+          id="exploitant"
+          v-model="form.exploitant"
+          :items="exploitants"
+          item-title="nom_exploitant"
+          item-value="id_exploitant"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Exploitant"
+          dense
+          hide-details
+          clearable
+        />
+        <!-- <label for="exploitant">Exploitant:</label>
         <select
           class="w3-input w3-border"
           id="exploitant"
@@ -57,22 +106,13 @@
           >
             {{ exploitant.nom_exploitant }}
           </option>
-        </select>
+        </select> -->
       </div>
     </div>
-
-      <!-- next id pour debug -->
-    <div v-if="props.mode === 'add'" class="form-cell">
-      (Next ID:
-      {{ nextId }}
-      )
-    </div>
-
+    
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -168,3 +208,17 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>

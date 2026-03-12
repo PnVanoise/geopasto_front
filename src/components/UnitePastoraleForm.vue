@@ -9,28 +9,73 @@
       ">
       <div style="">
         <div class="form-cell">
-          <label for="code_up">Code UP:</label>
+          <v-text-field
+            id="code_up"
+            v-model="form.properties.code_up"
+            :class="{ 'disable-events': props.isReadOnly }"
+            label="Code UP"
+            dense
+            hide-details
+            clearable
+          />
+          <!-- <label for="code_up">Code UP:</label>
           <input class="w3-input w3-border" type="text" id="code_up" v-model="form.properties.code_up" required
-            :disabled="props.isReadOnly" />
+            :disabled="props.isReadOnly" /> -->
         </div>
         <div class="form-cell">
-          <label for="nom_up">Nom UP:</label>
+          <v-text-field
+            id="nom_up"
+            v-model="form.properties.nom_up"
+            :class="{ 'disable-events': props.isReadOnly }"
+            label="Nom UP"
+            dense
+            hide-details
+            clearable
+          />
+          <!-- <label for="nom_up">Nom UP:</label>
           <input class="w3-input w3-border" type="text" id="nom_up" v-model="form.properties.nom_up" required
-            :disabled="props.isReadOnly" />
+            :disabled="props.isReadOnly" /> -->
         </div>
         <div class="form-cell">
-          <label for="secteur">Secteur:</label>
+          <v-text-field
+            id="secteur"
+            v-model="form.properties.secteur"
+            :class="{ 'disable-events': props.isReadOnly }"
+            label="Secteur"
+            dense
+            hide-details
+            clearable
+          />
+          <!-- <label for="secteur">Secteur:</label>
           <input class="w3-input w3-border" type="text" id="secteur" v-model="form.properties.secteur"
-            :disabled="props.isReadOnly" />
+            :disabled="props.isReadOnly" /> -->
         </div>
         <div class="form-cell">
-          <label for="annee_version">Année version:</label>
+          <v-text-field
+            id="annee_version"
+            v-model="form.properties.annee_version"
+            :class="{ 'disable-events': props.isReadOnly }"
+            label="Année version"
+            dense
+            hide-details
+            clearable
+          />
+          <!-- <label for="annee_version">Année version:</label>
           <input class="w3-input w3-border" type="text" id="annee_version" v-model="form.properties.annee_version"
-            required :disabled="props.isReadOnly" />
+            required :disabled="props.isReadOnly" /> -->
         </div>
         <div class="form-cell">
-          <label for="active">Version active ?</label>
-          <input type="checkbox" id="active" v-model="form.properties.version_active" :disabled="props.isReadOnly" />
+          <v-switch
+            id="version_active"
+            v-model="form.properties.version_active"
+            :class="{ 'disable-events': props.isReadOnly }"
+            label="Version active ?"
+            color="primary"
+            dense
+            hide-details
+          />
+          <!-- <label for="active">Version active ?</label>
+          <input type="checkbox" id="active" v-model="form.properties.version_active" :disabled="props.isReadOnly" /> -->
         </div>
         <!-- <div class="form-cell">
           <label for="proprietaire">Propriétaire :</label>
@@ -50,26 +95,36 @@
         </div> -->
         <!-- Test grille 1 -->
         <div class="grid-container">
-          <label>Situations :</label>
+          <h3>Situations d'exploitation</h3>
           <Grid :data="situationExploitations" :columns="situGridColumns" :bgColor="'#f7ba0b'"
             :columnLabels="situColumnLabels" :actions="gridActions" @edit="situOnEdit" @delete="situOnDelete">
           </Grid>
-          <button v-if="!isReadOnly" type="button" @click="goToAddSituation" class="w3-button w3-blue">
-            Nouvelle situation d'exploitation
-          </button>
+          <div class="form-actions">
+            <v-btn density="comfortable" color="info" @click="goToAddSituation" prepend-icon="mdi-plus-circle">
+              Nouvelle situation d'exploitation</v-btn>
+            <!-- <button v-if="!isReadOnly" type="button" @click="goToAddSituation" class="w3-button w3-blue">
+              Nouvelle situation d'exploitation
+            </button> -->
+          </div>
         </div>
 
         <div class="grid-container">
-          <label>Quartiers :</label>
+          <h3>Quartiers</h3>
           <Grid :data="quartiers" :columns="quarGridColumns" :bgColor="'#f7ba0b'" :columnLabels="quarColumnLabels"
             :actions="gridActions" @edit="quarOnEdit" @delete="quarOnDelete">
           </Grid>
-          <button v-if="!isReadOnly" type="button" @click="goToAddQuartier" class="w3-button w3-blue">
+          <div class="form-actions">
+            <v-btn density="comfortable" color="info" @click="goToAddQuartier" prepend-icon="mdi-plus-circle">
+              Nouveau quartier</v-btn>
+            <v-btn density="comfortable" color="info" @click="goToQuartiersList" prepend-icon="mdi-eye">
+              Voir les quartiers de l'UP</v-btn>
+          <!-- <button v-if="!isReadOnly" type="button" @click="goToAddQuartier" class="w3-button w3-blue">
             Nouveau quartier
           </button>
           <button type="button" @click="goToQuartiersList" class="w3-button w3-blue">
             Voir les quartiers de l'UP
-          </button>
+          </button> -->
+          </div>
         </div>
 
         <!-- <div class="grid-container">
@@ -109,7 +164,11 @@
         </div>
       </div>
     </div>
-    <button v-if="!isReadOnly" type="submit">Enregistrer</button>
+    <div class="form-actions">
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="!isReadOnly" color="success" type="submit" prepend-icon="mdi-content-save">Enregistrer</v-btn>
+      <!-- <button v-if="!isReadOnly" type="submit">Enregistrer</button> -->
+    </div>
   </form>
 </template>
 
@@ -510,4 +569,17 @@ const deleteQuartier = (id) => {
   overflow: hidden;
   /* Assure que le contenu s'adapte à l'arrondi */
 }
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+
 </style>

@@ -28,6 +28,9 @@ import UnitePastoraleList from '../components/UnitePastoraleList.vue'
 import UnitePastoraleAdd from '../components/UnitePastoraleAdd.vue'
 import UnitePastoraleEdit from '../components/UnitePastoraleEdit.vue'
 
+import ProprietaireFoncierList2 from '../components/ProprietaireFoncierList2.vue'
+import ProprietaireFoncierForm2 from '../components/ProprietaireFoncierForm2.vue'
+
 import ProprietaireFoncierList from '../components/ProprietaireFoncierList.vue'
 import ProprietaireFoncierAdd from '../components/ProprietaireFoncierAdd.vue'
 import ProprietaireFoncierEdit from '../components/ProprietaireFoncierEdit.vue'
@@ -44,6 +47,7 @@ import TypeDeSuiviList from '../components/TypeDeSuiviList.vue'
 import TypeDeSuiviAdd from '../components/TypeDeSuiviAdd.vue'
 import TypeDeSuiviEdit from '../components/TypeDeSuiviEdit.vue'
 
+import PlanDeSuiviList2 from '../components/PlanDeSuiviList2.vue'
 import PlanDeSuiviList from '../components/PlanDeSuiviList.vue'
 import PlanDeSuiviAdd from '../components/PlanDeSuiviAdd.vue'
 import PlanDeSuiviEdit from '../components/PlanDeSuiviEdit.vue'
@@ -130,6 +134,12 @@ const router = createRouter({
       path: '/UnitePastorale/edit/:id',
       name: 'editUP',
       component: UnitePastoraleEdit
+    },
+    {
+      path: '/ProprietaireFonciers2',
+      name: 'proprietairefonciers2',
+      component: ProprietaireFoncierList2,
+      meta: { requiresAuth: true },  // Route protégée
     },
     {
       path: '/ProprietaireFonciers',
@@ -225,6 +235,12 @@ const router = createRouter({
       path: '/TypeSuivi/edit/:id',
       name: 'editTypeSuivi',
       component: TypeDeSuiviEdit,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/PlanSuivis2',
+      name: 'plansuivis2',
+      component: PlanDeSuiviList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
