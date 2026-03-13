@@ -7,10 +7,12 @@
         label="Description"
         density="compact"
         v-model="form.description"
-        :disabled="props.mode === 'view' || !can('change')"
-        required
-        class="w3-half form-cell"
+        :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+        dense
+        hide-details
+        clearable
       />
+    </div>
 
       <!-- <div class="w3-half form-cell">
         <label for="desc">Description:</label>
@@ -23,32 +25,16 @@
           :disabled="props.mode === 'view' || !can('change')"
         />
       </div> -->
+    <div class="w3-row form-ligne">
       <v-text-field
         label="Etat"
         density="compact"
         v-model="form.etat"
-        :disabled="props.mode === 'view' || !can('change')"
-        class="w3-half form-cell"
+        :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+        dense
+        hide-details
+        clearable
       />
-      
-      <!-- <div class="w3-half form-cell">
-        <label for="etat">Etat:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="etat"
-          v-model="form.etat"
-          :disabled="props.mode === 'view' || !can('change')"
-        />
-      </div> -->
-    </div>
-    <div class="w3-row form-ligne">
-      <!-- next id pour debug -->
-      <div v-if="props.mode === 'add'" class="w3-half form-cell">
-        (Next ID:
-        {{ nextId }}
-        )
-      </div>
     </div>
 
     <div class="grid-container" style="margin-top:1rem;">
@@ -142,7 +128,7 @@ const form = reactive({
 
 // abri commodites
 const commGridColumns = ref([
-  { field: 'abri_urgence_description', label: 'Abri', sortable: true },
+  // { field: 'abri_urgence_description', label: 'Abri', sortable: true },
   { field: 'commodite_desc', label: 'Commodité', sortable: true },
   { field: 'etat', label: 'État', sortable: true },
   { field: 'quantite', label: 'Quantité', sortable: true },

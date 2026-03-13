@@ -1,127 +1,152 @@
 <template>
+  <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="abri">Abri d'urgence:</label>
-        <select class="w3-input w3-border" v-model="form.abri_urgence" id="abri" :disabled="isView">
-          <option v-for="abri in abris" :key="abri.id_abri_urgence" :value="abri.id_abri_urgence">
-            {{ abri.description }}
-          </option>
-        </select>
+        <v-select
+          id="abri"
+          v-model="form.abri_urgence"
+          :class="{ 'disable-events': true }"
+          :items="abris"
+          item-title="description"
+          item-value="id_abri_urgence"
+          label="Abri d'urgence"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="commodite">Commodité:</label>
-        <select class="w3-input w3-border" v-model="form.commodite" id="commodite" :disabled="isView">
-          <option
-            v-for="commodite in commodites"
-            :key="commodite.id_commodite"
-            :value="commodite.id_commodite"
-          >
-            {{ commodite.description }}
-          </option>
-        </select>
+        <v-select
+          id="commodite"
+          v-model="form.commodite"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          :items="commodites"
+          item-title="description"
+          item-value="id_commodite"
+          label="Commodité"
+          dense
+          hide-details
+          clearable
+        />
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="etat">Etat:</label>
-        <input class="w3-input w3-border" type="text" id="etat" v-model="form.etat" :disabled="isView" />
+        <v-text-field
+          type="text"
+          label="Etat"
+          v-model="form.etat"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="quantite">Quantité:</label>
-        <input
-          class="w3-input w3-border"
+        <v-text-field
           type="number"
-          id="quantite"
+          label="Quantité"
           v-model.number="form.quantite"
-          required
-          :disabled="isView"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
         />
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="form-cell">
-        <label for="commentaire">Commentaire:</label>
-        <input
-          class="w3-input w3-border"
+        <v-text-field
           type="text"
-          id="commentaire"
+          label="Commentaire"
           v-model="form.commentaire"
-          :disabled="isView"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
         />
       </div>
     </div>
-    <div class="w3-row form-ligne">
-      <div v-if="isAdding" class="form-cell">(Next ID: {{ nextId }})</div>
-      <button v-if="isEditable" type="submit">Enregistrer</button>
+    
+    <div class="form-actions">
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, computed } from "vue";
-
+import { reactive, watch, ref, computed, onMounted } from "vue";
 import config from "../../config";
 import auth from "../../auth";
+import { usePermissions } from "../composables/usePermissions";
 
 const props = defineProps({
-  initialForm: Object,
-  isEdit: Boolean,
-  mode: String,
+  initialForm: { type: Object, default: () => ({}) },
+  mode: { type: String, default: "view" }, // add | change | view
+  itemLabel: { type: String, default: "une commodité d'abri" },
+  abriId: { type: [String, Number], default: null },
   onSubmit: Function,
-  abriId: String,
+  onClose: Function,
 });
 
-// Prefer explicit `mode` when provided; fall back to `isEdit` for backward compatibility
-const isAdding = computed(() => props.mode === "add");
-const isEditing = computed(() => props.mode === "change" || props.mode === "edit");
-const isView = computed(() => props.mode === "view");
-const isEditable = computed(() => isAdding.value || isEditing.value || (props.mode === undefined && props.isEdit === true));
+const { can } = usePermissions("abridurgencecommodite");
+
+const formTitle = computed(() => {
+  if (props.mode === "add") return `Ajouter ${props.itemLabel}`;
+  if (props.mode === "change") return `Modifier ${props.itemLabel}`;
+  if (props.mode === "view") return `Voir les détails d'${props.itemLabel}`;
+  return "";
+});
+
+const btTitle = computed(() => {
+  if (props.mode === "add") return "Ajouter";
+  if (props.mode === "change") return "Enregistrer";
+  return "";
+});
 
 const abris = ref([]);
 const commodites = ref([]);
 
-const form = ref({ ...props.initialForm });
-
-// Variable pour stocker le nextId
-const nextId = ref(null);
-
-const submitForm = () => {
-  console.log("Abri commodité submit:", form.value);
-
-  if (!isEditing.value) {
-    // set id if needed by API (server may assign)
-    // form.value.id = nextId.value;
-  }
-
-  props
-    .onSubmit(form.value)
-    .then(() => {
-      console.log("Form submission then block executed");
-    })
-    .catch((error) => {
-      console.error("There was an error in form submission!", error);
-    });
-};
-
+const form = reactive({
+  id_abri_urgence_commodite: null,
+  abri_urgence: null,
+  commodite: null,
+  etat: "",
+  quantite: null,
+  commentaire: "",
+});
 watch(
   () => props.initialForm,
-  (newForm) => {
-    form.value = { ...newForm };
-    if (props.abriId) {
-      form.value.abri_urgence = props.abriId;
+  (newVal) => {
+    if (newVal) {
+      Object.assign(form, newVal);
     }
   },
-  { deep: true, immediate: true }
+  { immediate: true, deep: true }
 );
 
+// Ensure abri id is applied when parent passes it explicitly
+watch(
+  () => props.abriId,
+  (newVal) => {
+    if (newVal != null) {
+      form.abri_urgence = newVal;
+    }
+  },
+  { immediate: true }
+);
+
+// Next ID pour l'ajout
+const nextId = ref(null);
 onMounted(() => {
-  if (isAdding.value) {
+  if (props.mode === "add") {
     auth.axiosInstance
       .get(`${config.API_BASE_URL}/api/abriDUrgenceCommodite/getNextId/`)
       .then((response) => {
         nextId.value = response.data.next_id;
-        form.value.id_abri_urgence_commodite = nextId.value;
+        form.id_abri_urgence_commodite = nextId.value;
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération du Next ID", error);
@@ -149,12 +174,33 @@ onMounted(() => {
     });
 });
 
-onBeforeUnmount(() => {
-  console.log("AbriDUrgenceCommoditeForm component before unmount");
-});
+// Submit
+const submitForm = () => {
+  if (props.onSubmit) {
+    props.onSubmit(form)
+      .then(() => console.log("Form submitted OK"))
+      .catch(err => console.error(err));
+  }
+};
+
+// Close
+const closeModal = () => {
+  props.onClose?.();
+};
+
 </script>
 
+
 <style scoped>
-.form-ligne { padding: 8px; }
-.form-cell { padding: 8px; }
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
 </style>
