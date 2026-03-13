@@ -1,88 +1,83 @@
 <template>
   <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
   <form @submit.prevent="submitForm">
-    <!-- <div class="w3-row form-ligne"> -->
-    <div class="w3-half form-cell">
-      <label for="description">Description:</label>
-      <input
-        class="w3-input w3-border"
-        type="text"
-        id="description"
-        v-model="form.description"
-        required
-        :disabled="props.isReadOnly"
-      />
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">
+        <v-text-field 
+          id="description"
+          v-model="form.description"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Description"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field 
+          id="commentaire"
+          v-model="form.commentaire"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Commentaire"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
     </div>
-    <div class="w3-half form-cell">
-      <label for="commentaire">Commentaire:</label>
-      <input
-        class="w3-input w3-border"
-        type="text"
-        id="commentaire"
-        v-model="form.commentaire"
-        required
-        :disabled="props.isReadOnly"
-      />
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">
+        <v-text-field
+          type="date"
+          label="Date de début de période"
+          v-model="form.debut_periode"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field
+          type="date"
+          label="Date de fin de période"
+          v-model="form.fin_periode"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
     </div>
-    <div class="w3-half form-cell">
-      <label for="debut_periode">Date Début Période:</label>
-      <input
-        class="w3-input w3-border"
-        type="date"
-        id="debut_periode"
-        v-model="form.debut_periode"
-        @keydown.prevent
-        @paste.prevent
-        required
-        :disabled="props.isReadOnly"
-      />
-    </div>
-    <div class="w3-half form-cell">
-      <label for="fin_periode">Date Fin Période:</label>
-      <input
-        class="w3-input w3-border"
-        type="date"
-        id="fin_periode"
-        v-model="form.fin_periode"
-        @keydown.prevent
-        @paste.prevent
-        required
-        :disabled="props.isReadOnly"
-      />
-    </div>
-    <div class="w3-half form-cell">
-      <label for="typedemesure">Type de mesure:</label>
-      <select
-        class="w3-input w3-border"
-        v-model="form.type_mesure"
-        id="typedemesure"
-        :disabled="props.isReadOnly"
-      >
-        <option
-          v-for="typemesure in typemesures"
-          :key="typemesure.id_type_mesure"
-          :value="typemesure.id_type_mesure"
-        >
-          {{ typemesure.description }}
-        </option>
-      </select>
-    </div>
-    <div class="w3-half form-cell">
-      <label for="plandesuivi">Plan de suivi:</label>
-      <select
-        class="w3-input w3-border"
-        v-model="form.plan_suivi"
-        id="plandesuivi"
-        :disabled="props.isReadOnly"
-      >
-        <option
-          v-for="plansuivi in plansuivis"
-          :key="plansuivi.id_plan_suivi"
-          :value="plansuivi.id_plan_suivi"
-        >
-          {{ plansuivi.description }}
-        </option>
-      </select>
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">
+        <v-select
+          id="typedemesure"
+          v-model="form.type_mesure"
+          :items="typemesures"
+          item-title="description"
+          item-value="id_type_mesure"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Type de mesure"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-select
+          id="plandesuivi"
+          v-model="form.plan_suivi"
+          :items="plansuivis"
+          item-title="description"
+          item-value="id_plan_suivi"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Plan de suivi"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
     </div>
     
     <div class="form-actions">

@@ -12,7 +12,7 @@ import { computed, unref } from 'vue'
 
 const props = defineProps({
   show: [Boolean, Object],
-  closeOnOverlay: { type: Boolean, default: true }
+  closeOnOverlay: { type: Boolean, default: false }
 });
 const emit = defineEmits(["update:show", "close"]);
 
