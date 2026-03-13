@@ -64,6 +64,7 @@ import ExploiterList from '../components/ExploiterList.vue'
 import ExploiterAdd from '../components/ExploiterAdd.vue'
 import ExploiterEdit from '../components/ExploiterEdit.vue'
 
+import MesureDePlanList2 from '../components/MesureDePlanList2.vue'
 import MesureDePlanList from '../components/MesureDePlanList.vue'
 import MesureDePlanAdd from '../components/MesureDePlanAdd.vue'
 import MesureDePlanEdit from '../components/MesureDePlanEdit.vue'
@@ -265,6 +266,12 @@ const router = createRouter({
       path: '/TypeMesures2',
       name: 'typeMesures2',
       component: TypeDeMesureList2,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/MesurePlans2',
+      name: 'mesurePlans2',
+      component: MesureDePlanList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {

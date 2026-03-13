@@ -39,11 +39,11 @@
       </div>
       <div class="w3-half form-cell">
         <v-select
-          id="berger"
+          id="up"
           v-model="form.unite_pastorale"
-          :items="ups.features"
-          item-title="properties.nom_up"
-          item-value="id"
+          :items="ups"
+          item-title="nom_up"
+          item-value="id_unite_pastorale"
           :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
           label="Unité pastorale"
           dense
@@ -141,7 +141,7 @@ onMounted(() => {
 
   // Récupère les unités pastorales
   auth.axiosInstance
-    .get(`${config.API_BASE_URL}/api/unitePastorale/`)
+    .get(`${config.API_BASE_URL}/api/unitePastorale/light`)
     .then((response) => {
       ups.value = response.data;
       console.log("ups:", ups.value);
