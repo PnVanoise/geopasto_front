@@ -64,6 +64,7 @@
 
     <Grid3
       :data="filteredEntries"
+      @export-all="handleExportAll"
       :columns="columns"
       :actions="computedActions"
       :idField="idField"
@@ -192,6 +193,41 @@ const handleSubmit = async (formData) => {
   }
   crud.closeModal();
 };
+
+// CSV export helper used by parent when Grid3 requests full export
+function handleExportAll() {
+  const rows = crud.items.value || [];
+  const headerFields = (props.columns || []).map((c) => c.label || c.field);
+  const fields = (props.columns || []).map((c) => c.field);
+
+  const escape = (value) => {
+    if (value == null) return "";
+    const s = String(value).replace(/"/g, '""');
+    return `"${s}"`;
+  };
+
+  const lines = [];
+  lines.push(headerFields.map((h) => escape(h)).join(","));
+
+  for (const r of rows) {
+    const row = fields.map((f) => {
+      const v = getNestedValue(r, f);
+      return escape(v);
+    });
+    lines.push(row.join(","));
+  }
+
+  const csv = lines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "export_all.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 // If viewOnly is set, restrict actions to view-only in the grid
 const computedActions = computed(() => {

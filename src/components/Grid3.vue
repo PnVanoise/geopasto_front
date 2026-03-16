@@ -25,7 +25,7 @@ const props = defineProps({
   bgColor: String,
 });
 
-const emit = defineEmits(["edit", "delete", "view"]);
+const emit = defineEmits(["edit", "delete", "view", "export-all"]);
 
 // Sorting state (unifié)
 const sortField = ref(null);
@@ -76,6 +76,58 @@ function toggleSort(col) {
 // Renvoie la vraie valeur de l'id
 const getItemId = (item) => item[props.idField];
 
+// Export CSV helper
+function exportToCsv(rows, filename = "export.csv") {
+  if (!rows || !rows.length) {
+    const blob = new Blob([""], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    return;
+  }
+
+  const headerFields = (props.columns || []).map((c) => c.label || c.field);
+  const fields = (props.columns || []).map((c) => c.field);
+
+  const escape = (value) => {
+    if (value == null) return "";
+    const s = String(value).replace(/\"/g, '\"\"');
+    return `\"${s}\"`;
+  };
+
+  const lines = [];
+  lines.push(headerFields.map((h) => escape(h)).join(","));
+
+  for (const r of rows) {
+    const row = fields.map((f) => {
+      const v = nestedValue(r, f);
+      return escape(v);
+    });
+    lines.push(row.join(","));
+  }
+
+  const csv = lines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportAll() {
+  // Let the parent perform the full export using its authoritative source
+  emit("export-all");
+}
+
+function exportVisible() {
+  exportToCsv(displayedData.value || [], "export_visible.csv");
+}
+
 const showDeleteModal = ref(false);
 const entryToDelete = ref(null);
 
@@ -98,6 +150,11 @@ function performDelete() {
 </script>
 
 <template>
+  <div class="grid-actions">
+    <button type="button" class="export-btn" @click="exportAll">Exporter — Toutes les données</button>
+    <button type="button" class="export-btn" @click="exportVisible">Exporter — Données visibles</button>
+  </div>
+
   <div class="liste-container">
     <table
       v-if="displayedData.length"
@@ -303,5 +360,24 @@ th.active {
   border: none;
   padding: 8px 16px;
   cursor: pointer;
+}
+
+.grid-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.export-btn {
+  background-color: #2d8fef;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.export-btn:hover {
+  background-color: #1a6fd8;
 }
 </style>
