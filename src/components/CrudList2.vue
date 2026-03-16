@@ -3,8 +3,9 @@
     <h2 v-if="props.showTitle" class="w3-center">{{ title }}</h2>
 
     <div v-if="props.showHeader" class="header-actions">
-      <v-text-field
-      density="compact"
+      <div class="header-left">
+        <v-text-field
+          density="compact"
           v-if="props.showSearch"
           class="search-field"
           v-model="searchQuery"
@@ -13,57 +14,57 @@
           hide-details
           clearable
           append-inner-icon="mdi-magnify"
-      />
-      <!-- Rendu automatique des filtres -->
-      <template v-if="props.showFilters" v-for="filter in props.filters" :key="filter.key">
-        <!-- Checkbox -->
-        <div v-if="filter.type === 'checkbox'" style="margin: 0 10px;">
-          <v-switch
-            v-model="activeFilters[filter.key]"
-            :label="filter.label"
-            dense
-            hide-details
-            density="compact"
-          />
-        </div>
+        />
 
+        <!-- Rendu automatique des filtres -->
+        <template v-if="props.showFilters" v-for="filter in props.filters" :key="filter.key">
+          <!-- Checkbox -->
+          <div v-if="filter.type === 'checkbox'" style="margin: 0 10px;">
+            <v-switch
+              v-model="activeFilters[filter.key]"
+              :label="filter.label"
+              dense
+              hide-details
+              density="compact"
+            />
+          </div>
+
+          <!-- Select -->
+          <div v-if="filter.type === 'select'" style="margin: 0 10px; min-width:200px;">
+            <v-select
+              :items="[{ value: '', label: '-- Tous --' }].concat(unref(filter.options) || [])"
+              item-title="label"
+              item-value="value"
+              v-model="activeFilters[filter.key]"
+              :label="filter.label"
+              dense
+              hide-details
+              clearable
+              density="compact"
+            />
+          </div>
+        </template>
+      </div>
+
+      <div class="header-right">
+
+        <v-btn
+          v-if="props.showAddButton && !props.viewOnly && (crud.can('add') || props.forceAdd)"
+          color="info"
+          @click="crud.openAdd"
+          prepend-icon="mdi-plus-circle"
+          class="add-btn"
+        >
+          Ajouter
+        </v-btn>
         
-        <!-- Select -->
-        <div v-if="filter.type === 'select'" style="margin: 0 10px; min-width:200px;">
-          <v-select
-            :items="[{ value: '', label: '-- Tous --' }].concat(unref(filter.options) || [])"
-            item-title="label"
-            item-value="value"
-            v-model="activeFilters[filter.key]"
-            :label="filter.label"
-            dense
-            hide-details
-            clearable
-            density="compact"
-          />
-        </div>
-      </template>
-
-      
-      <v-btn
-        v-if="props.showAddButton && !props.viewOnly && (crud.can('add') || props.forceAdd)"
-        color="info"
-        @click="crud.openAdd"
-        prepend-icon="mdi-plus-circle">
-        Ajouter</v-btn>
-      
-      <!-- <button
-        type="button"
-        class="w3-button add-btn"
-        v-if="props.showAddButton && !props.viewOnly && (crud.can('add') || props.forceAdd)"
-        @click="crud.openAdd"
-      >
-          <font-awesome-icon icon="plus" /> Ajouter
-      </button> -->
+        
+      </div>
     </div>
 
     <Grid3
       :data="filteredEntries"
+      :showActions="false"
       @export-all="handleExportAll"
       :columns="columns"
       :actions="computedActions"
@@ -73,6 +74,18 @@
       @edit="handleEdit"
       @delete="handleDelete"
     />
+
+    <div class="grid-footer-actions">
+      <v-btn color="success" class="export-btn export-rect" @click="handleExportAll">
+        <v-icon left>mdi-file-delimited</v-icon>
+        Exporter — Toutes les données
+      </v-btn>
+
+      <v-btn color="success" class="export-btn export-rect" @click="exportVisible">
+        <v-icon left>mdi-file-delimited-outline</v-icon>
+        Exporter — Visibles
+      </v-btn>
+    </div>
 
     <Modal :show="crud.showModal.value" @close="crud.closeModal" :close-on-overlay="false">
       <component
@@ -194,6 +207,41 @@ const handleSubmit = async (formData) => {
   crud.closeModal();
 };
 
+// Export visible rows as CSV
+function exportVisible() {
+  const rows = filteredEntries.value || [];
+  const headerFields = (props.columns || []).map((c) => c.label || c.field);
+  const fields = (props.columns || []).map((c) => c.field);
+
+  const escape = (value) => {
+    if (value == null) return "";
+    const s = String(value).replace(/"/g, '""');
+    return `"${s}"`;
+  };
+
+  const lines = [];
+  lines.push(headerFields.map((h) => escape(h)).join(","));
+
+  for (const r of rows) {
+    const row = fields.map((f) => {
+      const v = getNestedValue(r, f);
+      return escape(v);
+    });
+    lines.push(row.join(","));
+  }
+
+  const csv = lines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "export_visible.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // CSV export helper used by parent when Grid3 requests full export
 function handleExportAll() {
   const rows = crud.items.value || [];
@@ -267,7 +315,7 @@ function handleDelete(item) {
 
 .header-actions {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
@@ -278,6 +326,30 @@ function handleDelete(item) {
 .header-actions .search-field {
   flex: 0 0 33%;
   min-width: 240px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.header-right .export-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 4px 6px;
+}
+
+.header-right .export-btn .v-icon {
+  font-size: 16px;
 }
 
 .header-actions .add-btn {
@@ -306,6 +378,31 @@ function handleDelete(item) {
   .header-actions .add-btn {
     flex: 1 1 auto;
     margin-left: 0;
+  }
+}
+
+/* Footer export buttons under the grid */
+.grid-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.grid-footer-actions .export-btn.export-rect {
+  border-radius: 4px; /* moins arrondi */
+  padding: 6px 12px;
+  height: 36px;
+  text-transform: none;
+}
+
+.grid-footer-actions .export-btn .v-icon {
+  font-size: 18px;
+}
+
+@media (max-width: 600px) {
+  .grid-footer-actions {
+    justify-content: flex-start;
   }
 }
 </style>

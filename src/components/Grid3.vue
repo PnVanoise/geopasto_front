@@ -23,6 +23,10 @@ const props = defineProps({
     default: "id",
   },
   bgColor: String,
+  showActions: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(["edit", "delete", "view", "export-all"]);
@@ -150,9 +154,21 @@ function performDelete() {
 </script>
 
 <template>
-  <div class="grid-actions">
-    <button type="button" class="export-btn" @click="exportAll">Exporter — Toutes les données</button>
-    <button type="button" class="export-btn" @click="exportVisible">Exporter — Données visibles</button>
+  <div v-if="props.showActions" class="grid-actions">
+    <v-btn
+      class="ma-2 compact"
+        color="success"
+        icon="mdi-file"
+        @click="exportAll"
+        v-tooltip="'Export csv de toutes les données'"></v-btn>
+    <v-btn
+      class="ma-2 compact"
+        color="success"
+        icon="mdi-file-outline"
+        @click="exportVisible"
+        v-tooltip="'Export csv des données visibles'"></v-btn>
+    <!-- <button type="button" class="export-btn" @click="exportAll">Exporter — Toutes les données</button>
+    <button type="button" class="export-btn" @click="exportVisible">Exporter — Données visibles</button> -->
   </div>
 
   <div class="liste-container">
@@ -364,8 +380,27 @@ th.active {
 
 .grid-actions {
   display: flex;
+  justify-content: flex-end;
+  align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+  width: 100%;
+}
+
+/* Réduire la taille des boutons d'export */
+.grid-actions ::v-deep(.v-btn) {
+  height: 28px;
+  min-width: 28px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+.grid-actions ::v-deep(.v-btn .v-icon),
+.grid-actions ::v-deep(.v-btn svg) {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
 }
 
 .export-btn {
