@@ -115,6 +115,7 @@ const props = defineProps({
   idField: { type: String, default: "id" },
   formComponent: Object,
   bgColor: { type: String, default: "#808080" },
+  geojsonMode: { type: Boolean, default: false },
   showYearFilter : { type : Boolean, default: false },
   searchFields: {
     type: Array,
@@ -134,7 +135,7 @@ const props = defineProps({
   initialNewItem: { type: Object, default: null },
   viewOnly: { type: Boolean, default: false },
 });
-const crud = useCrud(props.modelName, props.apiRouteName, props.idField);
+const crud = useCrud(props.modelName, props.apiRouteName, props.idField, { geojson: props.geojsonMode });
 const searchQuery = ref("");
 const activeFilters = ref({});
 

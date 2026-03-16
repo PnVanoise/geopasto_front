@@ -4,9 +4,11 @@ import config from "../../config";
 import { useMainStore } from "../store";
 import { usePermissions } from "./usePermissions";
 
-export function useCrud(modelName, apiRouteName, idField = "id") {
+export function useCrud(modelName, apiRouteName, idField = "id", options = {}) {
   const mainStore = useMainStore();
   const { can, actionsFor } = usePermissions(modelName);
+
+  const geojsonMode = !!options.geojson;
 
   const items = ref([]);
   const isLoading = ref(false);
@@ -23,6 +25,9 @@ export function useCrud(modelName, apiRouteName, idField = "id") {
       // Si l'API renvoie un FeatureCollection (GeoJSON), le convertir en tableau d'items
       if (data && data.type === 'FeatureCollection' && Array.isArray(data.features)) {
         items.value = data.features.map(f => ({ ...(f.properties || {}), id: f.id || f.properties?.id, geometry: f.geometry }));
+      } else if (geojsonMode && Array.isArray(data)) {
+        // Certains endpoints peuvent renvoyer un tableau de Feature
+        items.value = data.map(f => (f && f.type === 'Feature') ? ({ ...(f.properties || {}), id: f.id || f.properties?.id, geometry: f.geometry }) : f);
       } else {
         items.value = data;
       }
@@ -45,7 +50,20 @@ export function useCrud(modelName, apiRouteName, idField = "id") {
   };
 
   const createItem = async (payload) => {
-    await auth.axiosInstance.post(`${config.API_BASE_URL}/api/${apiRouteName}/`, payload);
+    let body = payload;
+    if (geojsonMode) {
+      if (payload && payload.properties) {
+        body = { type: "Feature", properties: payload.properties };
+        if (payload.geometry) body.geometry = payload.geometry;
+        if (payload.id) body.id = payload.id;
+      } else {
+        const { geometry, id, ...props } = payload || {};
+        body = { type: "Feature", properties: props };
+        if (geometry) body.geometry = geometry;
+        if (id) body.id = id;
+      }
+    }
+    await auth.axiosInstance.post(`${config.API_BASE_URL}/api/${apiRouteName}/`, body);
     mainStore.setSuccessMessage("Créé avec succès !");
     await fetchAll();
   };
@@ -55,7 +73,20 @@ export function useCrud(modelName, apiRouteName, idField = "id") {
     console.log("update / idField :", idField);
     const id = payload[idField];
     if (!id) throw new Error(`ID introuvable pour ${idField}`);
-    await auth.axiosInstance.put(`${config.API_BASE_URL}/api/${apiRouteName}/${id}/`, payload);
+    let body = payload;
+    if (geojsonMode) {
+      if (payload && payload.properties) {
+        body = { type: "Feature", properties: payload.properties };
+        if (payload.geometry) body.geometry = payload.geometry;
+        body.id = payload.id || payload.properties?.[idField] || payload[idField];
+      } else {
+        const { geometry, id: rootId, ...props } = payload || {};
+        body = { type: "Feature", properties: props };
+        if (geometry) body.geometry = geometry;
+        body.id = payload[idField] || rootId;
+      }
+    }
+    await auth.axiosInstance.put(`${config.API_BASE_URL}/api/${apiRouteName}/${id}/`, body);
     mainStore.setSuccessMessage("Modifié avec succès !");
     await fetchAll();
   };
@@ -69,23 +100,53 @@ export function useCrud(modelName, apiRouteName, idField = "id") {
 
   const openAdd = async () => {
     mode.value = "add";
-    selectedItem.value = {};
+    selectedItem.value = geojsonMode ? { properties: {} } : {};
     showModal.value = true;
   };
 
   const openEdit = (item) => {
     mode.value = "change";
     const it = { ...item };
-    if (!it[idField] && it.id) it[idField] = it.id;
-    selectedItem.value = it;
+    if (geojsonMode) {
+      // Ensure selectedItem is a Feature-like object: root id + properties + geometry
+      const props = it.properties ? { ...it.properties } : {};
+      // if properties missing, collect non-meta keys into properties
+      if (!it.properties) {
+        Object.keys(it).forEach((k) => {
+          if (k === "id" || k === "geometry") return;
+          props[k] = it[k];
+        });
+      }
+      const feature = { properties: props };
+      if (it.geometry) feature.geometry = it.geometry;
+      feature.id = it[idField] || it.id || props[idField] || null;
+      selectedItem.value = feature;
+    } else {
+      if (!it[idField] && it.id) it[idField] = it.id;
+      selectedItem.value = it;
+    }
     showModal.value = true;
   };
 
   const openView = (item) => {
     mode.value = "view";
     const it = { ...item };
-    if (!it[idField] && it.id) it[idField] = it.id;
-    selectedItem.value = it;
+    if (geojsonMode) {
+      const props = it.properties ? { ...it.properties } : {};
+      if (!it.properties) {
+        Object.keys(it).forEach((k) => {
+          if (k === "id" || k === "geometry") return;
+          props[k] = it[k];
+        });
+      }
+      const feature = { properties: props };
+      if (it.geometry) feature.geometry = it.geometry;
+      feature.id = it[idField] || it.id || props[idField] || null;
+      selectedItem.value = feature;
+    } else {
+      if (!it[idField] && it.id) it[idField] = it.id;
+      selectedItem.value = it;
+    }
     showModal.value = true;
   };
 
