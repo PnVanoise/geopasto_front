@@ -5,80 +5,99 @@
     <!-- Ligne 1 : Situation | Eleveur -->
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="situation">Situation:</label>
-        <select class="w3-input w3-border" v-model="form.situation_exploitation" id="situation" 
-          :disabled="props.mode === 'view' || !can('change')" >
-          <option v-for="situation in situations" :key="situation.id_situation" :value="situation.id_situation">
-            {{ situation.nom_situation }}
-          </option>
-        </select>
+        <v-select
+          id="situation"
+          v-model="form.situation_exploitation"
+          :items="situations"
+          item-title="nom_situation"
+          item-value="id_situation"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Situation d'exploitation"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="eleveur">Eleveur:</label>
-        <select class="w3-input w3-border" v-model="form.eleveur" id="eleveur" 
-          :disabled="props.mode === 'view' || !can('change')" >
-          <option v-for="eleveur in eleveurs" :key="eleveur.id_eleveur" :value="eleveur.id_eleveur">
-            {{ eleveur.prenom_eleveur }} {{ eleveur.nom_eleveur }}
-          </option>
-        </select>
+        <v-select
+          id="eleveur"
+          v-model="form.eleveur"
+          :items="eleveurs"
+          item-title="nom_complet"
+          item-value="id_eleveur"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Eleveur"
+          dense
+          hide-details
+          clearable
+        />
       </div>
     </div>
     <!-- Ligne 1 : Type cheptel | Nombre -->
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="typeCheptel">Type de cheptel:</label>
-        <select class="w3-input w3-border" v-model="form.type_cheptel" id="type_cheptel" 
-          :disabled="props.mode === 'view' || !can('change')" >
-          <option v-for="typeC in typeCs" :key="typeC.id_type_cheptel" :value="typeC.id_type_cheptel">
-            {{ typeC.description }}
-          </option>
-        </select>
+        <v-select 
+          id="typeCheptel"
+          v-model="form.type_cheptel"
+          :items="typeCs"
+          item-title="description"
+          item-value="id_type_cheptel"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Type de cheptel"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="eleveur">Nombre d'animaux:</label>
-        <input class="w3-input w3-border" type="number" min="1" id="nombre" v-model="form.nombre_animaux"
-          :disabled="props.mode === 'view' || !can('change')" />
+        <v-text-field
+          id="nombre" 
+          v-model="form.nombre_animaux"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Nombre d'animaux"
+          type="number"
+          min="1"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+    </div>
+    
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">        
+        <v-text-field
+          type="date" 
+          label="Date de début"
+          v-model="form.date_debut"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+      <div class="w3-half form-cell">
+        <v-text-field
+          type="date"
+          label="Date de fin"
+          v-model="form.date_fin"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          dense
+          hide-details
+          clearable
+        />
       </div>
     </div>
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="dateDebut">Date de début:</label>
-        <input class="w3-input w3-border" type="date" id="dateDebut" v-model="form.date_debut" @keydown.prevent
-          @paste.prevent 
-          :disabled="props.mode === 'view' || !can('change')" />
-      </div>
-      <div class="w3-half form-cell">
-        <label for="dateFin">Date de fin:</label>
-        <input class="w3-input w3-border" type="date" id="dateFin" v-model="form.date_fin" @keydown.prevent
-          @paste.prevent 
-          :disabled="props.mode === 'view' || !can('change')" />
-      </div>
-    </div>
-    <div class="w3-row form-ligne">
-      <div class="w3-half form-cell">
-        <label for="pension">En pension:</label>
-        <select
-          class="w3-input w3-border"
-          v-model="form.pension"
-          id="pension"
-          :disabled="props.mode === 'view' || !can('change')" >
-          <option value="Tous">Tous les animaux</option>
-          <option value="Aucun">Aucun animal</option>
-          <option value="Mix">Mix</option>
-        </select>
       </div>
       <div v-if="props.mode === 'add'" class="form-cell">
-        (Next ID:
-        {{ nextId }}
-        )
       </div>
     </div>
     
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -190,7 +209,7 @@ onMounted(() => {
 
   // Récupère les types de cheptel
   auth.axiosInstance
-    .get(`${config.API_BASE_URL}/api/typeCheptel/`)
+    .get(`${config.API_BASE_URL}/api/type_cheptel/`)
     .then((response) => {
       typeCs.value = response.data;
       console.log("typeCs:", typeCs.value);
@@ -218,3 +237,16 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>

@@ -21,6 +21,7 @@ import TypeDeConventionList2 from '../components/TypeDeConventionList2.vue'
 import TypeCheptelList2 from '../components/TypeCheptelList2.vue'
 import TypeDeSuiviList2 from '../components/TypeDeSuiviList2.vue'
 import TypeEvenementList2 from '../components/TypeEvenementList2.vue'
+import CheptelList2 from '../components/CheptelList2.vue'
 import EleverList2 from '../components/EleverList2.vue'
 import TypeDeMesureList2 from '../components/TypeDeMesureList2.vue'
 
@@ -480,6 +481,12 @@ const router = createRouter({
       path: '/GardeTroupeaux2',
       name: 'gardetroupeaux2',
       component: GardeTroupeauList2,
+      meta: { requiresAuth: true },  // Route protégée
+    },
+    {
+      path: '/Cheptels2',
+      name: 'cheptels2',
+      component: CheptelList2,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
