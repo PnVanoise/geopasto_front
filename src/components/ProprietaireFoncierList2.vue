@@ -17,13 +17,13 @@ import ProprietaireFoncierForm2 from './ProprietaireFoncierForm2.vue';
 import CrudList2 from './CrudList2.vue';
 
 const columns = [
-  { field: "description", label: "Description", sortable: true },
-  // { field: "prenom_propr", label: "Prénom", sortable: true },
+  { field: "nom_propr", label: "Nom", sortable: true },
+  { field: "prenom_propr", label: "Prénom", sortable: true },
 ];
 
 const searchFields = [
-  'description',
-  // 'prenom_propr',
+  'nom_propr',
+  'prenom_propr',
 ];
 
 </script>
