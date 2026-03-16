@@ -4,77 +4,81 @@
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <div class="w3-half form-cell">
-        <label for="desc">Description:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="desc"
+        <v-text-field
+          id="description" 
           v-model="form.description"
-          required
-          :disabled="props.mode === 'view' || !can('change')" />
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Description"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="espece">Espèce:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="espece"
-          v-model="form.espece"
-          required
-          :disabled="props.mode === 'view' || !can('change')" />
-      </div>
-      <div class="w3-half form-cell">
-        <label for="race">Race:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="race"
-          v-model="form.race"
-          :disabled="props.mode === 'view' || !can('change')" />
-      </div>
-      <div class="w3-half form-cell">
-        <label for="production">Production:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
+        <v-select
           id="production"
           v-model="form.production"
-          :disabled="props.mode === 'view' || !can('change')" />
+          :items="productions"
+          item-title="description"
+          item-value="id_production"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Production"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+    </div>
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">
+        <v-select
+          id="race"
+          v-model="form.race"
+          :items="races"
+          item-title="description"
+          item-value="id_race"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Race"
+          dense
+          hide-details
+          clearable
+        />
       </div>
       <div class="w3-half form-cell">
-        <label for="stadeM">Stade maturité:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="stadeM"
-          v-model="form.stade_maturite"
-          :disabled="props.mode === 'view' || !can('change')" />
-      </div>
-      <!-- <div class="w3-half form-cell">
-        <label for="pension">En pension:</label>
-        <select
-          class="w3-input w3-border"
-          v-model="form.pension"
+        <v-select
           id="pension"
-          :disabled="props.mode === 'view' || !can('change')" >
-          <option value="En totalité">Tous les animaux</option>
-          <option value="Aucun animal">Aucun animal</option>
-          <option value="Mix">Mix</option>
-        </select>
-      </div> -->
-      
-      <div v-if="props.mode === 'add'" class="form-cell">
-        (Next ID:
-        {{ nextId }}
-        )
+          v-model="form.pension"
+          :items="pensions"
+          item-title="description"
+          item-value="id_categorie_pension"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Pension"
+          dense
+          hide-details
+          clearable
+        />
+      </div>
+    </div>
+    <div class="w3-row form-ligne">
+      <div class="w3-half form-cell">
+        <v-select
+          id="categorie_animaux"
+          v-model="form.categorie_animaux"
+          :items="categories"
+          item-title="description"
+          item-value="id_categorie_animaux"
+          :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
+          label="Catégorie d'animaux"
+          dense
+          hide-details
+          clearable
+        />
       </div>
     </div>
     
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button>
-      <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button>
+      <v-btn density="comfortable" color="info" @click="closeModal" prepend-icon="mdi-arrow-left-circle">Retour</v-btn>
+      <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
 </template>
@@ -93,7 +97,7 @@ const props = defineProps({
   onClose: Function,
 });
 
-const { can } = usePermissions("typecheptel");
+const { can } = usePermissions("type_cheptel");
 
 const formTitle = computed(() => {
   if (props.mode === "add") return `Ajouter ${props.itemLabel}`;
@@ -110,14 +114,17 @@ const btTitle = computed(() => {
 
 // Formulaire réactif
 const form = reactive({
-  id_type_cheptel: null,
   description: "",
-  espece: "",
-  race: "",
   production: "",
-  stade_maturite: "",
-  // pension: "",
+  pension: "",
+  race: "",
+  categorie_animaux: "",
 });
+
+const productions = ref([]);
+const pensions = ref([]);
+const races = ref([]);
+const categories = ref([]);
 
 // Mettre à jour le formulaire à chaque changement de initialForm
 watch(
@@ -135,13 +142,50 @@ const nextId = ref(null);
 onMounted(() => {
   if (props.mode === "add") {
     auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/typeCheptel/getNextId/`)
+      .get(`${config.API_BASE_URL}/api/type_cheptel/getNextId/`)
       .then(res => {
         nextId.value = res.data.next_id;
         form.id_type_cheptel = nextId.value;
       })
       .catch(err => console.error("Erreur Next ID", err));
-  }
+  };
+
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/production/`)
+    .then((response) => {
+      productions.value = response.data;
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération de la liste des productions", error);
+    });
+
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/categorie_pension/`)
+    .then((response) => {
+      pensions.value = response.data;
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération de la liste des catégories de pensions", error);
+    });
+
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/categorie_animaux/`)
+    .then((response) => {
+      categories.value = response.data;
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération de la liste des catégories d'animaux", error);
+    });
+
+  auth.axiosInstance
+    .get(`${config.API_BASE_URL}/api/race/`)
+    .then((response) => {
+      races.value = response.data;
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération de la liste des races", error);
+    });
+
 });
 
 
@@ -159,3 +203,16 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.disable-events {
+  pointer-events: none
+}
+</style>
