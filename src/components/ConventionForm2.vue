@@ -234,23 +234,8 @@
               hide-details
               clearable
             />
-            <!-- <label for="effPo">Effectif porcin:</label>
-            <input
-              class="w3-input w3-border"
-              type="text"
-              id="effPo"
-              v-model="form.properties.effectif_porcin"
-              required
-            /> -->
           </div>
         </div>
-
-        <!-- next id is readonly -->
-        <!-- <div v-if="!isEdit" class="form-cell">
-          (Next ID:
-          {{ nextId }}
-          )
-        </div> -->
       </div>
       <div style="">
         <div class="form-cell">

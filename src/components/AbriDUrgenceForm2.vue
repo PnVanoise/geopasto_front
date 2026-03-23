@@ -1,35 +1,22 @@
 <template>
   <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
-
   <form @submit.prevent="submitForm">
     <div class="w3-row form-ligne">
       <v-text-field
-        label="Description"
-        density="compact"
+        id="description"
         v-model="form.description"
+        label="Description"
         :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
         dense
         hide-details
         clearable
       />
     </div>
-
-      <!-- <div class="w3-half form-cell">
-        <label for="desc">Description:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="desc"
-          v-model="form.description"
-          required
-          :disabled="props.mode === 'view' || !can('change')"
-        />
-      </div> -->
     <div class="w3-row form-ligne">
       <v-text-field
-        label="Etat"
-        density="compact"
+        id="etat"
         v-model="form.etat"
+        label="Etat"
         :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
         dense
         hide-details
@@ -74,16 +61,12 @@
         prepend-icon="mdi-arrow-left-circle">
         Retour</v-btn>
 
-      <!-- <button type="button" class="btn btn-secondary" @click="closeModal">Retour</button> -->
        <v-btn
         v-if="props.mode !== 'view'"
         color="success"
         type="submit"
         prepend-icon="mdi-content-save"
         >{{ btTitle }}</v-btn>
-      <!-- <button v-if="props.mode !== 'view'" type="submit" class="btn btn-primary">
-        {{ btTitle }}
-      </button> -->
     </div>
   </form>
 </template>
@@ -152,7 +135,6 @@ const isEditCommodite = ref(false);
 const selectedCommodite = ref({});
 const mainStore = useMainStore();
 
-// props.initialForm is assigned above; no duplicate watcher needed
 
 // Next ID pour l'ajout
 const nextId = ref(null);
@@ -166,8 +148,6 @@ onMounted(() => {
       })
       .catch(err => console.error("Erreur Next ID", err));
   };
-
-  // fetch commodites for current abri if present (handled by CrudList2)
 });
 
 
@@ -194,8 +174,6 @@ watch(
   },
   { immediate: true }
 );
-
-// CRUD of commodites handled by CrudList2; local helpers removed.
 </script>
 
 <style scoped>
