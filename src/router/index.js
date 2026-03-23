@@ -25,6 +25,8 @@ import CheptelList2 from '../components/CheptelList2.vue'
 import EleverList2 from '../components/EleverList2.vue'
 import TypeDeMesureList2 from '../components/TypeDeMesureList2.vue'
 
+
+import UnitePastoraleList2 from '../components/UnitePastoraleList2.vue'
 import UnitePastoraleList from '../components/UnitePastoraleList.vue'
 import UnitePastoraleAdd from '../components/UnitePastoraleAdd.vue'
 import UnitePastoraleEdit from '../components/UnitePastoraleEdit.vue'
@@ -54,6 +56,7 @@ import PlanDeSuiviAdd from '../components/PlanDeSuiviAdd.vue'
 import PlanDeSuiviEdit from '../components/PlanDeSuiviEdit.vue'
 
 import ConventionList from '../components/ConventionList.vue'
+import ConventionList2 from '../components/ConventionList2.vue'
 import ConventionAdd from '../components/ConventionAdd.vue'
 import ConventionEdit from '../components/ConventionEdit.vue'
 
@@ -120,6 +123,12 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/UnitePastorales2',
+      name: 'unitepastorales2',
+      component: UnitePastoraleList2,
+      meta: { requiresAuth: true },  // Route protégée
     },
     {
       path: '/UnitePastorales',
@@ -297,6 +306,11 @@ const router = createRouter({
       path: '/TypeConventions2',
       name: 'typeconventions2',
       component: TypeDeConventionList2,
+    },
+    {
+      path: '/Conventions2',
+      name: 'conventions2',
+      component: ConventionList2,
     },
     {
       path: '/Conventions',

@@ -277,6 +277,12 @@ const hasPermissionForModel = (modelName) => {
       <!-- Teste les persmissions sur le modèle -->
       <div v-if="hasPermissionForModel('unitepastorale').value" :class="[
         'nav-item w3-signal-yellow transparent',
+        { active: route.path === '/UnitePastorales2' },
+      ]">
+        <RouterLink to="/UnitePastorales2">Unités pastorales 2</RouterLink>
+      </div>
+      <div v-if="hasPermissionForModel('unitepastorale').value" :class="[
+        'nav-item w3-signal-yellow transparent',
         { active: route.path === '/UnitePastorales' },
       ]">
         <RouterLink to="/UnitePastorales">Unités pastorales</RouterLink>
@@ -295,6 +301,12 @@ const hasPermissionForModel = (modelName) => {
       ]">
         <RouterLink to="/TypeConventions">Types de convention</RouterLink>
       </div> -->
+      <div :class="[
+        'nav-item w3-signal-orange transparent',
+        { active: route.path === '/Conventions2' },
+      ]">
+        <RouterLink to="/Conventions2">Conventions d'exploitation 2</RouterLink>
+      </div>
       <div :class="[
         'nav-item w3-signal-orange transparent',
         { active: route.path === '/Conventions' },
