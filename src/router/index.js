@@ -63,6 +63,7 @@ import ConventionEdit from '../components/ConventionEdit.vue'
 import SituationExploitationList from '../components/SituationExploitationList.vue'
 import SituationExploitationAdd from '../components/SituationExploitationAdd.vue'
 import SituationExploitationEdit from '../components/SituationExploitationEdit.vue'
+import SituationExploitationList2 from '../components/SituationExploitationList2.vue'
 
 import ExploiterList from '../components/ExploiterList.vue'
 import ExploiterAdd from '../components/ExploiterAdd.vue'
@@ -326,6 +327,11 @@ const router = createRouter({
       path: '/Convention/edit/:id',
       name: 'editConvention',
       component: ConventionEdit,
+    },
+    {
+      path: '/SituationExploitations2',
+      name: 'situations2',
+      component: SituationExploitationList2,
     },
     {
       path: '/SituationExploitations',
