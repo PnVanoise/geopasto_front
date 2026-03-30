@@ -25,6 +25,8 @@ import CheptelList2 from '../components/CheptelList2.vue'
 import EleverList2 from '../components/EleverList2.vue'
 import TypeDeMesureList2 from '../components/TypeDeMesureList2.vue'
 
+import ConventionList2 from '../components/ConventionList2.vue'
+
 
 import UnitePastoraleList2 from '../components/UnitePastoraleList2.vue'
 import UnitePastoraleList from '../components/UnitePastoraleList.vue'
@@ -32,7 +34,6 @@ import UnitePastoraleAdd from '../components/UnitePastoraleAdd.vue'
 import UnitePastoraleEdit from '../components/UnitePastoraleEdit.vue'
 
 import ProprietaireFoncierList2 from '../components/ProprietaireFoncierList2.vue'
-import ProprietaireFoncierForm2 from '../components/ProprietaireFoncierForm2.vue'
 
 import ProprietaireFoncierList from '../components/ProprietaireFoncierList.vue'
 import ProprietaireFoncierAdd from '../components/ProprietaireFoncierAdd.vue'
@@ -46,19 +47,10 @@ import QuartierPastoList from '../components/QuartierPastoList.vue'
 import QuartierPastoAdd from '../components/QuartierPastoAdd.vue'
 import QuartierPastoEdit from '../components/QuartierPastoEdit.vue'
 
-import TypeDeSuiviList from '../components/TypeDeSuiviList.vue'
-import TypeDeSuiviAdd from '../components/TypeDeSuiviAdd.vue'
-import TypeDeSuiviEdit from '../components/TypeDeSuiviEdit.vue'
-
 import PlanDeSuiviList2 from '../components/PlanDeSuiviList2.vue'
 import PlanDeSuiviList from '../components/PlanDeSuiviList.vue'
 import PlanDeSuiviAdd from '../components/PlanDeSuiviAdd.vue'
 import PlanDeSuiviEdit from '../components/PlanDeSuiviEdit.vue'
-
-import ConventionList from '../components/ConventionList.vue'
-import ConventionList2 from '../components/ConventionList2.vue'
-import ConventionAdd from '../components/ConventionAdd.vue'
-import ConventionEdit from '../components/ConventionEdit.vue'
 
 import SituationExploitationList from '../components/SituationExploitationList.vue'
 import SituationExploitationAdd from '../components/SituationExploitationAdd.vue'
@@ -73,10 +65,6 @@ import MesureDePlanList2 from '../components/MesureDePlanList2.vue'
 import MesureDePlanList from '../components/MesureDePlanList.vue'
 import MesureDePlanAdd from '../components/MesureDePlanAdd.vue'
 import MesureDePlanEdit from '../components/MesureDePlanEdit.vue'
-
-import EleveurList from '../components/EleveurList.vue'
-import EleveurAdd from '../components/EleveurAdd.vue'
-import EleveurEdit from '../components/EleveurEdit.vue'
 
 import AbriDUrgenceList from '../components/AbriDUrgenceList.vue'
 import AbriDUrgenceAdd from '../components/AbriDUrgenceAdd.vue'
@@ -232,24 +220,6 @@ const router = createRouter({
       meta: { requiresAuth: true },  // Route protégée
     },
     {
-      path: '/TypeSuivis',
-      name: 'typesuivis',
-      component: TypeDeSuiviList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/TypeSuivi/add',
-      name: 'addTypeSuivi',
-      component: TypeDeSuiviAdd,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/TypeSuivi/edit/:id',
-      name: 'editTypeSuivi',
-      component: TypeDeSuiviEdit,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
       path: '/PlanSuivis2',
       name: 'plansuivis2',
       component: PlanDeSuiviList2,
@@ -314,21 +284,6 @@ const router = createRouter({
       component: ConventionList2,
     },
     {
-      path: '/Conventions',
-      name: 'conventions',
-      component: ConventionList,
-    },
-    {
-      path: '/Convention/add',
-      name: 'addConvention',
-      component: ConventionAdd,
-    },
-    {
-      path: '/Convention/edit/:id',
-      name: 'editConvention',
-      component: ConventionEdit,
-    },
-    {
       path: '/SituationExploitations2',
       name: 'situations2',
       component: SituationExploitationList2,
@@ -376,23 +331,6 @@ const router = createRouter({
       path: '/Eleveurs2',
       name: 'eleveurs2',
       component: EleveurList2,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Eleveurs',
-      name: 'eleveurs',
-      component: EleveurList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/Eleveur/add',
-      name: 'addEleveur',
-      component: EleveurAdd,
-    },
-    {
-      path: '/Eleveur/edit/:id',
-      name: 'editEleveur',
-      component: EleveurEdit,
       meta: { requiresAuth: true },  // Route protégée
     },
 

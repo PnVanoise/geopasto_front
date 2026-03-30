@@ -307,12 +307,6 @@ const hasPermissionForModel = (modelName) => {
       ]">
         <RouterLink to="/Conventions2">Conventions d'exploitation 2</RouterLink>
       </div>
-      <div :class="[
-        'nav-item w3-signal-orange transparent',
-        { active: route.path === '/Conventions' },
-      ]">
-        <RouterLink to="/Conventions">Conventions d'exploitation</RouterLink>
-      </div>
 
       <div :class="[
         'nav-item w3-signal-orange transparent',
