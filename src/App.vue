@@ -267,13 +267,6 @@ const hasPermissionForModel = (modelName) => {
       ]">
         <RouterLink to="/ProprietaireFonciers2">Propriétaires</RouterLink>
       </div>
-      <!-- <div :class="[
-        'nav-item w3-signal-yellow transparent',
-        { active: route.path === '/ProprietaireFonciers' },
-      ]">
-        <RouterLink to="/ProprietaireFonciers">Propriétaires</RouterLink>
-      </div> -->
-
       <!-- Teste les persmissions sur le modèle -->
       <div v-if="hasPermissionForModel('unitepastorale').value" :class="[
         'nav-item w3-signal-yellow transparent',
@@ -314,12 +307,6 @@ const hasPermissionForModel = (modelName) => {
       ]">
         <RouterLink to="/SituationExploitations2">Situations d'exploitation  2</RouterLink>
       </div>
-      <div :class="[
-        'nav-item w3-signal-orange transparent',
-        { active: route.path === '/SituationExploitations' },
-      ]">
-        <RouterLink to="/SituationExploitations">Situations d'exploitation</RouterLink>
-      </div>
 
       <div :class="[
         'nav-item w3-signal-orange transparent',
@@ -354,12 +341,6 @@ const hasPermissionForModel = (modelName) => {
         { active: route.path === '/Cheptels2' },
       ]">
         <RouterLink to="/Cheptels2">Cheptels</RouterLink>
-      </div>
-      <div :class="[
-        'nav-item w3-signal-orange transparent',
-        { active: route.path === '/Elevers2' },
-      ]">
-        <RouterLink to="/Elevers2">Elevers</RouterLink>
       </div>
 
       <div :class="[

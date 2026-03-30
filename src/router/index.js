@@ -22,7 +22,6 @@ import TypeCheptelList2 from '../components/TypeCheptelList2.vue'
 import TypeDeSuiviList2 from '../components/TypeDeSuiviList2.vue'
 import TypeEvenementList2 from '../components/TypeEvenementList2.vue'
 import CheptelList2 from '../components/CheptelList2.vue'
-import EleverList2 from '../components/EleverList2.vue'
 import TypeDeMesureList2 from '../components/TypeDeMesureList2.vue'
 
 import ConventionList2 from '../components/ConventionList2.vue'
@@ -34,10 +33,6 @@ import UnitePastoraleAdd from '../components/UnitePastoraleAdd.vue'
 import UnitePastoraleEdit from '../components/UnitePastoraleEdit.vue'
 
 import ProprietaireFoncierList2 from '../components/ProprietaireFoncierList2.vue'
-
-import ProprietaireFoncierList from '../components/ProprietaireFoncierList.vue'
-import ProprietaireFoncierAdd from '../components/ProprietaireFoncierAdd.vue'
-import ProprietaireFoncierEdit from '../components/ProprietaireFoncierEdit.vue'
 
 import UPProprietaireList from '../components/UPProprietaireList.vue'
 import UPProprietaireAdd from '../components/UPProprietaireAdd.vue'
@@ -52,9 +47,6 @@ import PlanDeSuiviList from '../components/PlanDeSuiviList.vue'
 import PlanDeSuiviAdd from '../components/PlanDeSuiviAdd.vue'
 import PlanDeSuiviEdit from '../components/PlanDeSuiviEdit.vue'
 
-import SituationExploitationList from '../components/SituationExploitationList.vue'
-import SituationExploitationAdd from '../components/SituationExploitationAdd.vue'
-import SituationExploitationEdit from '../components/SituationExploitationEdit.vue'
 import SituationExploitationList2 from '../components/SituationExploitationList2.vue'
 
 import ExploiterList from '../components/ExploiterList.vue'
@@ -139,24 +131,6 @@ const router = createRouter({
       path: '/ProprietaireFonciers2',
       name: 'proprietairefonciers2',
       component: ProprietaireFoncierList2,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/ProprietaireFonciers',
-      name: 'proprietairefonciers',
-      component: ProprietaireFoncierList,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/ProprietaireFoncier/add',
-      name: 'addPropr',
-      component: ProprietaireFoncierAdd,
-      meta: { requiresAuth: true },  // Route protégée
-    },
-    {
-      path: '/ProprietaireFoncier/edit/:id',
-      name: 'editPropr',
-      component: ProprietaireFoncierEdit,
       meta: { requiresAuth: true },  // Route protégée
     },
     {
@@ -287,27 +261,6 @@ const router = createRouter({
       path: '/SituationExploitations2',
       name: 'situations2',
       component: SituationExploitationList2,
-    },
-    {
-      path: '/SituationExploitations',
-      name: 'situations',
-      component: SituationExploitationList,
-    },
-    {
-      path: '/SituationExploitation/add',
-      name: 'addSituation',
-      component: SituationExploitationAdd,
-    },
-    {
-      path: '/SituationExploitation/add/:UPId',
-      name: 'addSituationWithUPId',
-      component: SituationExploitationAdd,
-      props: true
-    },
-    {
-      path: '/SituationExploitation/edit/:id',
-      name: 'editSituation',
-      component: SituationExploitationEdit,
     },
     {
       path: '/Exploiters',
@@ -447,12 +400,12 @@ const router = createRouter({
       component: CheptelList2,
       meta: { requiresAuth: true },  // Route protégée
     },
-    {
-      path: '/Elevers2',
-      name: 'elevers2',
-      component: EleverList2,
-      meta: { requiresAuth: true },  // Route protégée
-    },
+    // {
+    //   path: '/Elevers2',
+    //   name: 'elevers2',
+    //   component: EleverList2,
+    //   meta: { requiresAuth: true },  // Route protégée
+    // },
     // {
     //   path: '/Elever/add',
     //   name: 'addElever',
