@@ -50,8 +50,11 @@ export function useCrud(modelName, apiRouteName, idField = "id", options = {}) {
   };
 
   const createItem = async (payload) => {
+    console.log("create / payload :", payload);
+    console.log("create / idField :", idField);
     let body = payload;
     if (geojsonMode) {
+      console.log("Creating in GeoJSON mode");
       if (payload && payload.properties) {
         body = { type: "Feature", properties: payload.properties };
         if (payload.geometry) body.geometry = payload.geometry;
@@ -63,7 +66,17 @@ export function useCrud(modelName, apiRouteName, idField = "id", options = {}) {
         if (id) body.id = id;
       }
     }
-    await auth.axiosInstance.post(`${config.API_BASE_URL}/api/${apiRouteName}/`, body);
+
+    // defensive: don't send client-side id on create
+    const sendBody = JSON.parse(JSON.stringify(body));
+    // if (!geojsonMode) {
+    //   delete sendBody[idField];
+    // } else {
+    //   if (sendBody.properties) delete sendBody.properties[idField];
+    //   delete sendBody.id;
+    // }
+
+    await auth.axiosInstance.post(`${config.API_BASE_URL}/api/${apiRouteName}/`, sendBody);
     mainStore.setSuccessMessage("Créé avec succès !");
     await fetchAll();
   };
@@ -98,9 +111,14 @@ export function useCrud(modelName, apiRouteName, idField = "id", options = {}) {
     await fetchAll();
   };
 
-  const openAdd = async () => {
+  // Open add modal, optionally with an initial item to prefill the form
+  const openAdd = async (initialItem = null) => {
     mode.value = "add";
-    selectedItem.value = geojsonMode ? { properties: {} } : {};
+    if (initialItem) {
+      selectedItem.value = initialItem;
+    } else {
+      selectedItem.value = geojsonMode ? { properties: {} } : {};
+    }
     showModal.value = true;
   };
 
@@ -154,6 +172,7 @@ export function useCrud(modelName, apiRouteName, idField = "id", options = {}) {
     console.log("Closing modal");
     showModal.value = false;
     selectedItem.value = null;
+    mode.value = "view";
   };
 
   return {

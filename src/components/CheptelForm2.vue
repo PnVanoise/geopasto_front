@@ -1,5 +1,11 @@
 <template>
   <h3 class="w3-center w3-margin">{{ formTitle }}</h3>
+  <div class="debug-block" style="margin:0.5rem 0;padding:0.5rem;border:1px dashed #ccc;">
+    <div style="font-weight:600;margin-bottom:0.25rem;">initialForm (parent / selectedItem):</div>
+    <pre style="max-height:160px;overflow:auto;margin:0 0 0.5rem 0;">{{ JSON.stringify(props.initialForm, null, 2) }}</pre>
+    <div style="font-weight:600;margin-bottom:0.25rem;">form (local reactive):</div>
+    <pre style="max-height:160px;overflow:auto;margin:0">{{ JSON.stringify(form, null, 2) }}</pre>
+  </div>
 
   <form @submit.prevent="submitForm">
     <!-- Ligne 1 : Situation | Eleveur -->
@@ -153,6 +159,7 @@ const eleveurs = ref([]);
 const typeCs = ref([]);
 
 const situLocked = computed(() => {
+  console.log("initialForm for situLocked:", props.initialForm);
   const initialSitu = props.initialForm && (props.initialForm.situation_exploitation || props.initialForm.situation || props.initialForm.id_situation);
   return !!initialSitu;
 });
@@ -199,6 +206,26 @@ watch(
       // If initialForm contains an exploitant, reload eleveurs filtered by that exploitant
       if (newVal.exploitant) {
         loadEleveurs(newVal.exploitant);
+      }
+      else if (newVal.situation_detail && newVal.situation_detail.exploitant) {
+        loadEleveurs(newVal.situation_detail.exploitant);
+      }
+      // If initialForm contains a situation, reload situations filtered accordingly
+      const initialSitu = newVal.situation_exploitation || newVal.situation || newVal.id_situation;
+      if (initialSitu) {
+        auth.axiosInstance
+          .get(`${config.API_BASE_URL}/api/situationExploitation/`)
+          .then((response) => {
+            const data = response.data || [];
+            const found = data.find(s => s.id_situation === initialSitu || s.id === initialSitu || (s.properties && (s.properties.id_situation === initialSitu)));
+            situations.value = found ? [found] : data.filter(s => s.id_situation === initialSitu || s.id === initialSitu);
+            if (situLocked.value) {
+              form.situation_exploitation = initialSitu;
+            }
+          })
+          .catch((error) => {
+            console.error("Erreur lors de la récupération de la liste des situations d'exploitation.", error);
+          });
       }
     }
   },

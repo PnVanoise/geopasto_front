@@ -51,7 +51,7 @@
         <v-btn
           v-if="props.showAddButton && !props.viewOnly && (crud.can('add') || props.forceAdd)"
           color="info"
-          @click="crud.openAdd"
+          @click="() => crud.openAdd(props.initialNewItem ? { ...props.initialNewItem } : null)"
           prepend-icon="mdi-plus-circle"
           class="add-btn"
         >
