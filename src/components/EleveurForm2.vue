@@ -13,36 +13,17 @@
           hide-details
           clearable
         />
-
-        <!-- <label for="nom">Nom:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="nom"
-          v-model="form.nom_eleveur"
-          required
-          :disabled="props.mode === 'view' || !can('change')"
-        /> -->
       </div>
       <div class="w3-half form-cell">
-        
         <v-text-field
           id="prenom"
-          v-model="form.nom_eleveur"
+          v-model="form.prenom_eleveur"
           :class="{ 'disable-events': props.mode === 'view' || !can('change') }"
-          label="Préom"
+          label="Prénom"
           dense
           hide-details
           clearable
         />
-        <!-- <label for="Prénom">Prénom:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="nom"
-          v-model="form.prenom_eleveur"
-          :disabled="props.mode === 'view' || !can('change')"
-        /> -->
       </div>
     </div>
     <div class="w3-row form-ligne">
@@ -56,14 +37,6 @@
           hide-details
           clearable
         />
-        <!-- <label for="nom">Téléphone:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="nom"
-          v-model="form.tel_eleveur"
-          :disabled="props.mode === 'view' || !can('change')"
-        /> -->
       </div>
       <div class="w3-half form-cell">
         <v-text-field
@@ -75,14 +48,6 @@
           hide-details
           clearable
         />
-        <!-- <label for="nom">Email:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="nom"
-          v-model="form.mail_eleveur"
-          :disabled="props.mode === 'view' || !can('change')"
-        /> -->
       </div>
     </div>
     <div class="w3-row form-ligne">
@@ -96,14 +61,6 @@
           hide-details
           clearable
         />
-        <!-- <label for="nom">Adresse:</label>
-        <input
-          class="w3-input w3-border"
-          type="text"
-          id="nom"
-          v-model="form.adresse_eleveur"
-          :disabled="props.mode === 'view' || !can('change')"
-        /> -->
       </div>
       <div class="w3-half form-cell">
         <v-text-field
@@ -123,12 +80,10 @@
       <v-btn density="comfortable" v-if="props.mode !== 'view'" color="success" type="submit" prepend-icon="mdi-content-save">{{ btTitle }}</v-btn>
     </div>
   </form>
-</template>
+</template>s
 
 <script setup>
-import { reactive, watch, ref, computed, onMounted } from "vue";
-import config from "../../config";
-import auth from "../../auth";
+import { reactive, watch, computed, onMounted } from "vue";
 import { usePermissions } from "../composables/usePermissions";
 
 const props = defineProps({
@@ -154,7 +109,6 @@ const btTitle = computed(() => {
   return "";
 });
 
-// Formulaire réactif
 const form = reactive({
   id_eleveur: null,
   nom_eleveur: "",
@@ -169,33 +123,27 @@ watch(
   () => props.initialForm,
   (newVal) => {
     if (newVal) {
-      Object.assign(form, newVal); 
+      Object.assign(form, newVal);
+      // assurer l'ID pour le mode "change" (compatibilité id / id_eleveur)
+      if (newVal.id_eleveur) form.id_eleveur = newVal.id_eleveur;
+      else if (newVal.id) form.id_eleveur = newVal.id;
     }
   },
   { immediate: true }
 );
 
-// Next ID pour l'ajout
-const nextId = ref(null);
 onMounted(() => {
-  if (props.mode === "add") {
-    auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/eleveur/getNextId/`)
-      .then(res => {
-        nextId.value = res.data.next_id;
-        form.id_eleveur = nextId.value;
-      })
-      .catch(err => console.error("Erreur Next ID", err));
-  }
 });
 
 // Submit
 const submitForm = () => {
-  if (props.onSubmit) {
-    props.onSubmit(form)
-      .then(() => console.log("Form submitted OK"))
-      .catch(err => console.error(err));
-  }
+  if (!props.onSubmit) return;
+  // payload propre (deep copy) : enlever champs read-only et n'envoyer l'id que pour update
+  const payload = JSON.parse(JSON.stringify(form));
+  if (props.mode === 'add') delete payload.id_eleveur;
+  props.onSubmit(payload)
+    .then(() => console.log("Form submitted OK"))
+    .catch(err => console.error(err));
 };
 
 // Close
@@ -203,6 +151,7 @@ const closeModal = () => {
   props.onClose?.();
 };
 </script>
+
 <style scoped>
 .form-actions {
   display: flex;

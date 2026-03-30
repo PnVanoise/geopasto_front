@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { reactive, watch, ref, computed, onMounted } from "vue";
+import { reactive, watch, computed, onMounted } from "vue";
 import config from "../../config";
 import auth from "../../auth";
 import { usePermissions } from "../composables/usePermissions";
@@ -60,33 +60,27 @@ watch(
   (newVal) => {
     if (newVal) {
       Object.assign(form, newVal);
+      // assurer l'ID pour le mode "change" (compatibilité id / id_categorie_pension)
+      if (newVal.id_categorie_pension) form.id_categorie_pension = newVal.id_categorie_pension;
+      else if (newVal.id) form.id_categorie_pension = newVal.id;
     }
   },
   { immediate: true }
 );
 
-// Next ID pour l'ajout
-const nextId = ref(null);
 onMounted(() => {
-  if (props.mode === "add") {
-    auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/categorie_pension/getNextId/`)
-      .then(res => {
-        nextId.value = res.data.next_id;
-        form.id_categorie_pension = nextId.value;
-      })
-      .catch(err => console.error("Erreur Next ID", err));
-  };
 });
 
 
 // Submits
 const submitForm = () => {
-  if (props.onSubmit) {
-    props.onSubmit(form)
-      .then(() => console.log("Form submitted OK"))
-      .catch(err => console.error(err));
-  }
+  if (!props.onSubmit) return;
+  // payload propre (deep copy) : enlever champs read-only et n'envoyer l'id que pour update
+  const payload = JSON.parse(JSON.stringify(form));
+  if (props.mode === 'add') delete payload.id_categorie_pension;
+  props.onSubmit(payload)
+    .then(() => console.log("Form submitted OK"))
+    .catch(err => console.error(err));
 };
 
 // Close

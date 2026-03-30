@@ -78,24 +78,15 @@ watch(
   (newVal) => {
     if (newVal) {
       Object.assign(form, newVal);
+      // assurer l'ID pour le mode "change" (compatibilité id / id_categorie_animaux)
+      if (newVal.id_categorie_animaux) form.id_categorie_animaux = newVal.id_categorie_animaux;
+      else if (newVal.id) form.id_categorie_animaux = newVal.id;
     }
   },
   { immediate: true }
 );
 
-// Next ID pour l'ajout
-const nextId = ref(null);
 onMounted(() => {
-  if (props.mode === "add") {
-    auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/categorie_animaux/getNextId/`)
-      .then(res => {
-        nextId.value = res.data.next_id;
-        form.id_categorie_animaux = nextId.value;
-      })
-      .catch(err => console.error("Erreur Next ID", err));
-  };
-
   auth.axiosInstance
     .get(`${config.API_BASE_URL}/api/espece/`)
     .then((response) => {
@@ -109,11 +100,13 @@ onMounted(() => {
 
 // Submits
 const submitForm = () => {
-  if (props.onSubmit) {
-    props.onSubmit(form)
-      .then(() => console.log("Form submitted OK"))
-      .catch(err => console.error(err));
-  }
+  if (!props.onSubmit) return;
+  // payload propre (deep copy) : enlever champs read-only et n'envoyer l'id que pour update
+  const payload = JSON.parse(JSON.stringify(form));
+  if (props.mode === 'add') delete payload.id_categorie_animaux;
+  props.onSubmit(payload)
+    .then(() => console.log("Form submitted OK"))
+    .catch(err => console.error(err));
 };
 
 // Close

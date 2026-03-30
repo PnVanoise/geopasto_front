@@ -75,33 +75,27 @@ watch(
   (newVal) => {
     if (newVal) {
       Object.assign(form, newVal);
+      // assurer l'ID pour le mode "change" (compatibilité id / id_type_equipement)
+      if (newVal.id_type_equipement) form.id_type_equipement = newVal.id_type_equipement;
+      else if (newVal.id) form.id_type_equipement = newVal.id;
     }
   },
   { immediate: true }
 );
 
-// Next ID pour l'ajout
-const nextId = ref(null);
 onMounted(() => {
-  if (props.mode === "add") {
-    auth.axiosInstance
-      .get(`${config.API_BASE_URL}/api/typeEquipement/getNextId/`)
-      .then(res => {
-        nextId.value = res.data.next_id;
-        form.id_type_equipement = nextId.value;
-      })
-      .catch(err => console.error("Erreur Next ID", err));
-  }
 });
 
 
 // Submit
 const submitForm = () => {
-  if (props.onSubmit) {
-    props.onSubmit(form)
-      .then(() => console.log("Form submitted OK"))
-      .catch(err => console.error(err));
-  }
+  if (!props.onSubmit) return;
+  // payload propre (deep copy) : enlever champs read-only et n'envoyer l'id que pour update
+  const payload = JSON.parse(JSON.stringify(form));
+  if (props.mode === 'add') delete payload.id_type_equipement;
+  props.onSubmit(payload)
+    .then(() => console.log("Form submitted OK"))
+    .catch(err => console.error(err));
 };
 
 // Close
